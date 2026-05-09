@@ -2,11 +2,16 @@ import {
   FloatingMenuPlugin,
   type FloatingMenuPluginProps,
 } from "@tiptap/extension-floating-menu";
-import { createEffect, type JSX, onCleanup, splitProps } from "solid-js";
-import { Portal } from "solid-js/web";
+import {
+  createEffect,
+  createMemo,
+  type JSX,
+  onCleanup,
+  splitProps,
+} from "solid-js";
+import { Portal, spread } from "solid-js/web";
 import { useCurrentEditor } from "../Context";
 import { getAutoPluginKey } from "./getAutoPluginKey";
-import { useMenuElementProps } from "./useMenuElementProps";
 
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
@@ -27,18 +32,15 @@ export const FloatingMenu = (props: FloatingMenuProps) => {
     "shouldShow",
     "options",
     "children",
-    "ref",
   ]);
 
-  const menuEl = document.createElement("div");
-  const resolvedPluginKey = getAutoPluginKey(props.pluginKey, "floatingMenu");
-
-  useMenuElementProps(menuEl, rest);
-
-  createEffect(() => {
-    if (typeof props.ref === "function") {
-      props.ref(menuEl);
-    }
+  const resolvedPluginKey = createMemo(() =>
+    getAutoPluginKey(props.pluginKey, "floatingMenu"),
+  );
+  const menuEl = createMemo(() => {
+    const el = document.createElement("div");
+    spread(el, rest);
+    return el;
   });
 
   const currentEditorCtx = useCurrentEditor();
@@ -55,15 +57,16 @@ export const FloatingMenu = (props: FloatingMenuProps) => {
       return;
     }
 
-    const floatingMenuElement = menuEl;
+    const floatingMenuElement = menuEl();
     floatingMenuElement.style.visibility = "hidden";
     floatingMenuElement.style.position = "absolute";
 
+    const pluginKey = resolvedPluginKey();
     const plugin = FloatingMenuPlugin({
       updateDelay: props.updateDelay,
       resizeDelay: props.resizeDelay,
       appendTo: props.appendTo,
-      pluginKey: resolvedPluginKey,
+      pluginKey,
       shouldShow: props.shouldShow,
       options: props.options,
       editor: editor,
@@ -73,7 +76,7 @@ export const FloatingMenu = (props: FloatingMenuProps) => {
     editor.registerPlugin(plugin);
 
     onCleanup(() => {
-      editor.unregisterPlugin(resolvedPluginKey);
+      editor.unregisterPlugin(pluginKey);
       window.requestAnimationFrame(() => {
         if (floatingMenuElement.parentNode) {
           floatingMenuElement.parentNode.removeChild(floatingMenuElement);
@@ -90,7 +93,7 @@ export const FloatingMenu = (props: FloatingMenuProps) => {
     }
 
     editor.view.dispatch(
-      editor.state.tr.setMeta(resolvedPluginKey, {
+      editor.state.tr.setMeta(resolvedPluginKey(), {
         type: "updateOptions",
         options: {
           updateDelay: props.updateDelay,
@@ -103,5 +106,5 @@ export const FloatingMenu = (props: FloatingMenuProps) => {
     );
   });
 
-  return <Portal mount={menuEl}>{props.children}</Portal>;
+  return <Portal mount={menuEl()}>{props.children}</Portal>;
 };

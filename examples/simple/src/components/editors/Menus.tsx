@@ -1,5 +1,5 @@
-import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
+import StarterKit from "@tiptap/starter-kit";
 import { Show } from "solid-js";
 import { Tiptap, useEditor } from "tiptap-solid";
 import { BubbleMenu, FloatingMenu } from "tiptap-solid/menus";
@@ -24,18 +24,54 @@ export const MenusEditor = () => {
     <div class="tiptap-editor overflow-hidden relative border rounded-lg bg-white shadow-sm">
       <Tiptap editor={editor}>
         <Show when={editor()}>
-          {(e) => (
+          {(editor) => (
             <>
-              <BubbleMenu editor={e()} class="flex bg-white border border-border shadow-xl rounded-lg overflow-hidden p-1.5 gap-1 animate-in fade-in zoom-in duration-200">
-                <Button onClick={() => e().chain().focus().toggleBold().run()}>B</Button>
-                <Button onClick={() => e().chain().focus().toggleItalic().run()}>I</Button>
-                <Button onClick={() => e().chain().focus().toggleStrike().run()}>S</Button>
+              <BubbleMenu
+                editor={editor()}
+                class="flex bg-white border border-border shadow-xl rounded-lg overflow-hidden p-1.5 gap-1 animate-in fade-in zoom-in duration-200"
+              >
+                <Button
+                  onClick={() => editor().chain().focus().toggleBold().run()}
+                >
+                  B
+                </Button>
+                <Button
+                  onClick={() => editor().chain().focus().toggleItalic().run()}
+                >
+                  I
+                </Button>
+                <Button
+                  onClick={() => editor().chain().focus().toggleStrike().run()}
+                >
+                  S
+                </Button>
               </BubbleMenu>
 
-              <FloatingMenu editor={e()} class="flex bg-white border border-border shadow-xl rounded-lg overflow-hidden p-1.5 gap-1 animate-in fade-in slide-in-from-left-4 duration-300">
-                <Button onClick={() => e().chain().focus().toggleHeading({ level: 1 }).run()}>H1</Button>
-                <Button onClick={() => e().chain().focus().toggleHeading({ level: 2 }).run()}>H2</Button>
-                <Button onClick={() => e().chain().focus().toggleBulletList().run()}>UL</Button>
+              <FloatingMenu
+                editor={editor()}
+                class="flex bg-white border border-border shadow-xl rounded-lg overflow-hidden p-1.5 gap-1 animate-in fade-in slide-in-from-left-4 duration-300"
+              >
+                <Button
+                  onClick={() =>
+                    editor().chain().focus().toggleHeading({ level: 1 }).run()
+                  }
+                >
+                  H1
+                </Button>
+                <Button
+                  onClick={() =>
+                    editor().chain().focus().toggleHeading({ level: 2 }).run()
+                  }
+                >
+                  H2
+                </Button>
+                <Button
+                  onClick={() =>
+                    editor().chain().focus().toggleBulletList().run()
+                  }
+                >
+                  UL
+                </Button>
               </FloatingMenu>
             </>
           )}

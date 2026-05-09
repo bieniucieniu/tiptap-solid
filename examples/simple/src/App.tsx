@@ -56,11 +56,6 @@ const App: Component<RouteSectionProps> = (props) => {
       <Navigation />
 
       <main class="min-h-125">{props.children}</main>
-
-      <footer class="mt-16 pt-10 border-t text-center text-sm text-muted-foreground/60 font-medium">
-        <p>Built with SolidJS, Tailwind 4, and Tiptap Solid.</p>
-        <p class="mt-1 text-xs">© 2024 tip-tap-solid team</p>
-      </footer>
     </div>
   );
 };
