@@ -1,6 +1,6 @@
-import { SolidRenderer } from "./solid-renderer";
-import { Editor, EditorOptions } from "@tiptap/core";
-import { Accessor, createSignal, Setter } from "solid-js";
+import { Editor, type EditorOptions } from "@tiptap/core";
+import { type Accessor, createSignal, type Setter } from "solid-js";
+import type { SolidRenderer } from "./solid-renderer";
 
 class SolidEditor extends Editor {
   public declare renderers: Accessor<SolidRenderer[]>;

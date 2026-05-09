@@ -1,7 +1,9 @@
-import { createRef } from "./ref";
-import { Component, JSX, onMount } from "solid-js";
-import { FloatingMenuPlugin, FloatingMenuPluginProps } from "@tiptap/extension-floating-menu";
+import {
+  FloatingMenuPlugin,
+  type FloatingMenuPluginProps,
+} from "@tiptap/extension-floating-menu";
 import { nanoid } from "nanoid";
+import { type Component, type JSX, onMount } from "solid-js";
 
 type FloatingMenuWrapperProps = Omit<
   FloatingMenuPluginProps,
@@ -13,12 +15,11 @@ type FloatingMenuWrapperProps = Omit<
 };
 
 const FloatingMenuWrapper: Component<FloatingMenuWrapperProps> = (props) => {
-  const [getContainer, setContainer] = createRef<HTMLDivElement>();
+  let container: HTMLDivElement | null = null;
   const pluginKey = nanoid();
 
   onMount(() => {
     const { editor, shouldShow, tippyOptions } = props;
-    const container = getContainer();
 
     if (container) {
       editor.registerPlugin(
@@ -27,18 +28,22 @@ const FloatingMenuWrapper: Component<FloatingMenuWrapperProps> = (props) => {
           pluginKey,
           shouldShow: shouldShow || null,
           element: container,
-          tippyOptions
-        })
+          tippyOptions,
+        }),
       );
     }
   });
 
   return (
-    <div ref={setContainer} class={props.class} style={{ visibility: "hidden" }}>
+    <div
+      ref={(ref) => (container = ref)}
+      class={props.class}
+      style={{ visibility: "hidden" }}
+    >
       {props.children}
     </div>
   );
 };
 
-export { FloatingMenuWrapper };
 export type { FloatingMenuWrapperProps };
+export { FloatingMenuWrapper };

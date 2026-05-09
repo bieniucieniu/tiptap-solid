@@ -1,57 +1,59 @@
-import { SolidEditor } from "./editor";
-import { SolidRenderer } from "./solid-renderer";
-import { createRef } from "./ref";
-import { Component, For, createEffect, on, onCleanup, JSX, splitProps } from "solid-js";
+import type { EditorOptions } from "@tiptap/core";
+import {
+  type Component,
+  createEffect,
+  For,
+  type JSX,
+  onCleanup,
+  splitProps,
+} from "solid-js";
 import { Dynamic, Portal } from "solid-js/web";
+import type { SolidEditor } from "./editor";
 
-interface PortalsProps {
-  renderers: SolidRenderer[];
+function appendChildNodes(
+  container: HTMLElement,
+  element: EditorOptions["element"],
+): HTMLElement {
+  if (element && "mount" in element) {
+    return element.mount;
+  }
+  if (typeof element === "function") {
+    element(container);
+  } else if (element) {
+    container.append(...element.childNodes);
+  }
+  return container;
 }
-
-const Portals: Component<PortalsProps> = (props) => {
-  return (
-    <For each={props.renderers}>
-      {(renderer) => {
-        return (
-          <Portal mount={renderer.element}>
-            <Dynamic component={renderer.component} state={renderer.state()} />
-          </Portal>
-        );
-      }}
-    </For>
-  );
-};
 
 interface SolidEditorContentProps extends JSX.HTMLAttributes<HTMLDivElement> {
   editor: SolidEditor;
+  ref?: (ref: HTMLDivElement) => void;
 }
 
 const SolidEditorContent: Component<SolidEditorContentProps> = (props) => {
-  const [getEditorContentContainer, setEditorContentContainer] = createRef<HTMLElement>();
   const [, passedProps] = splitProps(props, ["editor"]);
+  let editorContentContainer: HTMLElement | null = null;
 
-  createEffect(
-    on([() => props.editor], () => {
-      const { editor } = props;
+  createEffect(() => {
+    const { editor } = props;
 
-      if (editor && editor.options.element) {
-        const editorContentContainer = getEditorContentContainer();
-
-        if (editorContentContainer) {
-          editorContentContainer.append(...editor.options.element.childNodes);
-          editor.setOptions({
-            element: editorContentContainer
-          });
-        }
-
-        setTimeout(() => {
-          if (!editor.isDestroyed) {
-            editor.createNodeViews();
-          }
-        }, 0);
+    if (editor && editor.options.element) {
+      if (editorContentContainer) {
+        editor.setOptions({
+          element: appendChildNodes(
+            editorContentContainer,
+            editor.options.element,
+          ),
+        });
       }
-    })
-  );
+
+      setTimeout(() => {
+        if (!editor.isDestroyed) {
+          editor.createNodeViews();
+        }
+      }, 0);
+    }
+  });
   onCleanup(() => {
     const { editor } = props;
 
@@ -61,29 +63,48 @@ const SolidEditorContent: Component<SolidEditorContentProps> = (props) => {
 
     if (!editor.isDestroyed) {
       editor.view.setProps({
-        nodeViews: {}
+        nodeViews: {},
       });
     }
 
-    if (!editor.options.element.firstChild) {
+    if (
+      !(editor.options.element instanceof Node) ||
+      !editor.options.element.firstChild
+    ) {
       return;
     }
 
     const newElement = document.createElement("div");
 
-    newElement.append(...editor.options.element.childNodes);
     editor.setOptions({
-      element: newElement
+      element: appendChildNodes(newElement, editor.options.element),
     });
   });
 
   return (
     <>
-      <div {...passedProps} ref={setEditorContentContainer} />
-      <Portals renderers={props.editor.renderers()} />
+      <div
+        {...passedProps}
+        ref={(ref) => {
+          editorContentContainer = ref;
+          props.ref?.(ref);
+        }}
+      />
+      <For each={props.editor.renderers()}>
+        {(renderer) => {
+          return (
+            <Portal mount={renderer.element}>
+              <Dynamic
+                component={renderer.component}
+                state={renderer.state()}
+              />
+            </Portal>
+          );
+        }}
+      </For>
     </>
   );
 };
 
-export { SolidEditorContent };
 export type { SolidEditorContentProps };
+export { SolidEditorContent };

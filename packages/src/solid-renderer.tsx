@@ -1,7 +1,12 @@
-import { SolidEditor } from "./editor";
-import { Attrs, SolidNodeViewProps } from "./use-solid-node-view";
-import { Accessor, Component, createSignal, Setter } from "solid-js";
 import { nanoid } from "nanoid";
+import {
+  type Accessor,
+  type Component,
+  createSignal,
+  type Setter,
+} from "solid-js";
+import type { SolidEditor } from "./editor";
+import type { SolidNodeViewProps } from "./types";
 
 interface SolidRendererOptions<S = SolidNodeViewProps> {
   editor: SolidEditor;
@@ -9,7 +14,7 @@ interface SolidRendererOptions<S = SolidNodeViewProps> {
   as?: string;
 }
 
-class SolidRenderer<S = SolidNodeViewProps> {
+class SolidRenderer<R = unknown, S extends Record<string, any> = object> {
   public declare state: Accessor<S>;
 
   public declare setState: Setter<S>;
@@ -24,7 +29,7 @@ class SolidRenderer<S = SolidNodeViewProps> {
 
   public constructor(
     component: Component<{ state: S }>,
-    { editor, state: initialState, as = "div" }: SolidRendererOptions<S>
+    { editor, state: initialState, as = "div" }: SolidRendererOptions<S>,
   ) {
     const [state, setState] = createSignal<S>(initialState);
     const element = document.createElement(as);
@@ -37,7 +42,7 @@ class SolidRenderer<S = SolidNodeViewProps> {
     this.editor = editor;
     this.editor.setRenderers([
       ...this.editor.renderers(),
-      this as unknown as SolidRenderer<SolidNodeViewProps<Attrs>>,
+      this as unknown as SolidRenderer<SolidNodeViewProps>,
     ]);
   }
 
@@ -48,5 +53,5 @@ class SolidRenderer<S = SolidNodeViewProps> {
   }
 }
 
-export { SolidRenderer };
 export type { SolidRendererOptions };
+export { SolidRenderer };

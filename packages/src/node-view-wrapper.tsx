@@ -1,33 +1,32 @@
-import { SolidNodeViewContextProps, useSolidNodeView, Attrs } from "./use-solid-node-view";
-import { Ref } from "./ref";
-import { Component, JSX, splitProps } from "solid-js";
+import { type Component, type JSX, splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
+import { useSolidNodeView } from "./use-solid-node-view";
 
 interface NodeViewWrapperProps {
   [key: string]: unknown;
   style?: JSX.CSSProperties;
-  ref?: Ref<Element>;
+  ref?: (ref: Element) => void;
   as?: string | Component<Record<string, unknown>>;
 }
 
 const NodeViewWrapper: Component<NodeViewWrapperProps> = (props) => {
-  const { state } = useSolidNodeView() as SolidNodeViewContextProps<Attrs>;
+  const nv = useSolidNodeView();
   const [local, otherProps] = splitProps(props, ["ref"]);
 
   return (
     <Dynamic
       {...otherProps}
       component={props.as || "div"}
-      ref={local.ref ? local.ref[1] : null}
+      ref={local.ref}
       data-node-view-wrapper="true"
-      onDragStart={state().onDragStart}
+      onDragStart={(e: DragEvent) => nv.onDragStart?.(e)}
       style={{
         ...props.style,
-        whiteSpace: "normal"
+        whiteSpace: "normal",
       }}
     />
   );
 };
 
-export { NodeViewWrapper };
 export type { NodeViewWrapperProps };
+export { NodeViewWrapper };

@@ -1,10 +1,9 @@
-import { createRef } from "./ref";
 import {
   BubbleMenuPlugin,
-  BubbleMenuPluginProps,
+  type BubbleMenuPluginProps,
 } from "@tiptap/extension-bubble-menu";
-import { Component, JSX, onMount } from "solid-js";
 import { nanoid } from "nanoid";
+import { type Component, type JSX, onMount } from "solid-js";
 
 type BubbleMenuWrapperProps = Omit<
   BubbleMenuPluginProps,
@@ -16,12 +15,11 @@ type BubbleMenuWrapperProps = Omit<
 };
 
 const BubbleMenuWrapper: Component<BubbleMenuWrapperProps> = (props) => {
-  const [getContainer, setContainer] = createRef<HTMLDivElement>();
+  let container: HTMLDivElement | null = null;
   const pluginKey = nanoid();
 
   onMount(() => {
     const { editor, shouldShow, tippyOptions } = props;
-    const container = getContainer();
 
     if (container) {
       editor.registerPlugin(
@@ -37,14 +35,14 @@ const BubbleMenuWrapper: Component<BubbleMenuWrapperProps> = (props) => {
           },
           element: container,
           tippyOptions,
-        })
+        }),
       );
     }
   });
 
   return (
     <div
-      ref={setContainer}
+      ref={(ref) => (container = ref)}
       class={props.class}
       style={{ visibility: "hidden" }}
     >
@@ -53,5 +51,5 @@ const BubbleMenuWrapper: Component<BubbleMenuWrapperProps> = (props) => {
   );
 };
 
-export { BubbleMenuWrapper };
 export type { BubbleMenuWrapperProps };
+export { BubbleMenuWrapper };

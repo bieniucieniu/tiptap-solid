@@ -1,27 +1,36 @@
-import { SolidEditor } from "./editor";
-import { Accessor, Context, createContext, useContext } from "solid-js";
-import { NodeViewProps } from "@tiptap/core";
-import { Node as ProseMirrorNode } from "@tiptap/pm/model";
+import { createComponent, createContext, type JSX, useContext } from "solid-js";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type Attrs = Record<string, any>;
-
-interface SolidNodeViewProps<A extends Attrs = Attrs> extends NodeViewProps {
-  node: ProseMirrorNode & { attrs: A };
-  editor: SolidEditor;
-}
-interface SolidNodeViewContextProps<A extends Attrs = Attrs> {
-  state: Accessor<
-    SolidNodeViewProps<A> & {
-      onDragStart?(event: DragEvent): void;
-    }
-  >;
+export interface SolidNodeViewContextProps {
+  onDragStart?: (event: DragEvent) => void;
+  nodeViewContentRef?: (element: HTMLElement | null) => void;
+  /**
+   * This allows you to add children into the NodeViewContent component.
+   * This is useful when statically rendering the content of a node view.
+   */
+  nodeViewContentChildren?: JSX.Element;
 }
 
-const SolidNodeViewContext = createContext();
-const useSolidNodeView = <A extends Attrs = Attrs>(): SolidNodeViewContextProps<A> => {
-  return useContext(SolidNodeViewContext as Context<SolidNodeViewContextProps<A>>);
+export const SolidNodeViewContext = createContext<SolidNodeViewContextProps>({
+  onDragStart: () => {
+    // no-op
+  },
+  nodeViewContentChildren: undefined,
+  nodeViewContentRef: () => {
+    // no-op
+  },
+});
+
+export const SolidNodeViewContentProvider = ({
+  children,
+  content,
+}: {
+  children: JSX.Element;
+  content: JSX.Element;
+}) => {
+  return createComponent(SolidNodeViewContext.Provider, {
+    value: { nodeViewContentChildren: content },
+    children,
+  });
 };
 
-export { SolidNodeViewContext, useSolidNodeView };
-export type { SolidNodeViewContextProps, SolidNodeViewProps, Attrs };
+export const useSolidNodeView = () => useContext(SolidNodeViewContext);

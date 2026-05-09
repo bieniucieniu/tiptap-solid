@@ -1,53 +1,154 @@
 import {
-  SolidNodeViewContext,
-  SolidNodeViewProps,
-} from "./use-solid-node-view";
-import { SolidEditor } from "./editor";
-import { SolidRenderer } from "./solid-renderer";
-import { Decoration, NodeView as ProseMirrorNodeView } from "@tiptap/pm/view";
-import {
-  DecorationWithType,
+  type DecorationWithType,
+  type Editor,
+  isNodeViewSelected,
   NodeView,
-  NodeViewRenderer,
-  NodeViewRendererOptions,
-  NodeViewRendererProps,
+  type NodeViewRenderer,
+  type NodeViewRendererOptions,
+  type NodeViewRendererProps,
 } from "@tiptap/core";
-import { Component, createMemo } from "solid-js";
+import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
+import type {
+  Decoration,
+  DecorationSource,
+  NodeView as ProseMirrorNodeView,
+} from "@tiptap/pm/view";
+import { type Component, createMemo, type JSX } from "solid-js";
 import { Dynamic } from "solid-js/web";
-import { Node as ProseMirrorNode } from "@tiptap/pm/model";
+import type { SolidEditor } from "./editor";
+import { SolidRenderer } from "./solid-renderer";
+import type { SolidNodeViewProps } from "./types";
+import {
+  SolidNodeViewContext,
+  type SolidNodeViewContextProps,
+} from "./use-solid-node-view";
 
-interface SolidNodeViewRendererOptions extends NodeViewRendererOptions {
-  setSelection:
-    | ((anchor: number, head: number, root: Document | ShadowRoot) => void)
-    | null;
+export interface SolidNodeViewRendererOptions extends NodeViewRendererOptions {
+  /**
+   * This function is called when the node view is updated.
+   * It allows you to compare the old node with the new node and decide if the component should update.
+   */
   update:
     | ((props: {
         oldNode: ProseMirrorNode;
-        oldDecorations: Decoration[];
+        oldDecorations: readonly Decoration[];
+        oldInnerDecorations: DecorationSource;
         newNode: ProseMirrorNode;
-        newDecorations: Decoration[];
+        newDecorations: readonly Decoration[];
+        innerDecorations: DecorationSource;
         updateProps: () => void;
       }) => boolean)
     | null;
+  /**
+   * The tag name of the element wrapping the React component.
+   */
+  as?: string;
+  /**
+   * The class name of the element wrapping the React component.
+   */
+  className?: string;
+  /**
+   * Attributes that should be applied to the element wrapping the React component.
+   * If this is a function, it will be called each time the node view is updated.
+   * If this is an object, it will be applied once when the node view is mounted.
+   */
+  attrs?:
+    | Record<string, string>
+    | ((props: {
+        node: ProseMirrorNode;
+        HTMLAttributes: Record<string, any>;
+      }) => Record<string, string>);
 }
 
 type SetSelectionListener = (
   anchor: number,
   head: number,
-  root: Document | ShadowRoot
+  root: Document | ShadowRoot,
 ) => void;
 
-class SolidNodeView extends NodeView<
-  Component,
-  SolidEditor,
-  SolidNodeViewRendererOptions
-> {
+class SolidNodeView<
+  T = HTMLElement,
+  Comp extends Component<SolidNodeViewProps<T>> = Component<
+    SolidNodeViewProps<T>
+  >,
+  NodeEditor extends Editor = Editor,
+  Options extends SolidNodeViewRendererOptions = SolidNodeViewRendererOptions,
+> extends NodeView<Comp, SolidEditor, SolidNodeViewRendererOptions> {
   public setSelectionListeners: SetSelectionListener[] = [];
-
-  public declare contentDOMElement: HTMLElement | null;
 
   public declare renderer: SolidRenderer;
 
+  public declare contentDOMElement: HTMLElement;
+
+  selectionRafId: number | null = null;
+
+  private currentPos: number | undefined;
+
+  constructor(
+    component: Comp,
+    props: NodeViewRendererProps,
+    options?: Partial<Options>,
+  ) {
+    super(component, props, options);
+
+    if (!this.node.isLeaf) {
+      if (this.options.contentDOMElementTag) {
+        this.contentDOMElement = document.createElement(
+          this.options.contentDOMElementTag,
+        );
+      } else {
+        this.contentDOMElement = document.createElement(
+          this.node.isInline ? "span" : "div",
+        );
+      }
+
+      this.contentDOMElement.dataset.nodeViewContentReact = "";
+      this.contentDOMElement.dataset.nodeViewWrapper = "";
+
+      // For some reason the whiteSpace prop is not inherited properly in Chrome and Safari
+      // With this fix it seems to work fine
+      // See: https://github.com/ueberdosis/tiptap/issues/1197
+      this.contentDOMElement.style.whiteSpace = "inherit";
+
+      const contentTarget = this.dom.querySelector("[data-node-view-content]");
+
+      if (!contentTarget) {
+        return;
+      }
+
+      contentTarget.appendChild(this.contentDOMElement);
+    }
+  }
+
+  private cachedExtensionWithSyncedStorage:
+    | NodeViewRendererProps["extension"]
+    | null = null;
+
+  /**
+   * Returns a proxy of the extension that redirects storage access to the editor's mutable storage.
+   * This preserves the original prototype chain (instanceof checks, methods like configure/extend work).
+   * Cached to avoid proxy creation on every update.
+   */
+  get extensionWithSyncedStorage(): NodeViewRendererProps["extension"] {
+    if (!this.cachedExtensionWithSyncedStorage) {
+      const editor = this.editor;
+      const extension = this.extension;
+
+      this.cachedExtensionWithSyncedStorage = new Proxy(extension, {
+        get(target, prop, receiver) {
+          if (prop === "storage") {
+            return (
+              editor.storage[extension.name as keyof typeof editor.storage] ??
+              {}
+            );
+          }
+          return Reflect.get(target, prop, receiver);
+        },
+      });
+    }
+
+    return this.cachedExtensionWithSyncedStorage;
+  }
   public get dom(): HTMLElement {
     const portalContainer = this.renderer.element.firstElementChild;
 
@@ -56,7 +157,7 @@ class SolidNodeView extends NodeView<
       !portalContainer.firstElementChild?.hasAttribute("data-node-view-wrapper")
     ) {
       throw new Error(
-        "Please use the NodeViewWrapper component for your node view."
+        "Please use the NodeViewWrapper component for your node view.",
       );
     }
 
@@ -74,50 +175,70 @@ class SolidNodeView extends NodeView<
   }
 
   public mount(): void {
+    let ref: HTMLElement | null = null;
     const state: SolidNodeViewProps = {
       editor: this.editor,
       node: this.node,
-      decorations: this.decorations,
+      decorations: this.decorations as DecorationWithType[],
       selected: false,
       extension: this.extension,
+      innerDecorations: this.innerDecorations,
+      view: this.view,
+      HTMLAttributes: this.HTMLAttributes,
       getPos: () => this.getPos(),
       updateAttributes: (attributes = {}) => this.updateAttributes(attributes),
       deleteNode: () => this.deleteNode(),
+      ref: (r) => {
+        ref = r;
+      },
     };
-    const SolidNodeViewProvider: Component<{ state: SolidNodeViewProps }> = (
-      props
-    ) => {
-      const component = createMemo(() => this.component);
+
+    const onDragStart = (e: DragEvent) => this.onDragStart(e);
+    const nodeViewContentRef: SolidNodeViewContextProps["nodeViewContentRef"] =
+      (element) => {
+        if (
+          element &&
+          this.contentDOMElement &&
+          element.firstChild !== this.contentDOMElement
+        ) {
+          // remove the nodeViewWrapper attribute from the element
+          if (element.hasAttribute("data-node-view-wrapper")) {
+            element.removeAttribute("data-node-view-wrapper");
+          }
+          element.appendChild(this.contentDOMElement);
+        }
+      };
+
+    const SolidNodeViewProvider: Component<SolidNodeViewProps<T>> = (
+      props,
+    ): JSX.Element => {
       const context = {
-        state: createMemo(() => ({
-          onDragStart: this.onDragStart.bind(this),
-          ...props.state,
-        })),
+        onDragStart,
+        nodeViewContentRef,
       };
 
       return (
         <SolidNodeViewContext.Provider value={context}>
-          <Dynamic component={component()} />
+          <Dynamic
+            component={(p: SolidNodeViewProps<T>) => this.component(p)}
+            {...props}
+          />
         </SolidNodeViewContext.Provider>
       );
     };
 
-    if (this.node.isLeaf) {
-      this.contentDOMElement = null;
-    } else {
-      this.contentDOMElement = document.createElement(
-        this.node.isInline ? "span" : "div"
-      );
-    }
+    const as = createMemo(
+      () => this.options.as || (this.node.isInline ? "span" : "div"),
+    );
 
-    if (this.contentDOMElement) {
-      this.contentDOMElement.style.whiteSpace = "inherit";
-    }
+    this.handleSelectionUpdate = this.handleSelectionUpdate.bind(this);
 
     this.renderer = new SolidRenderer(SolidNodeViewProvider, {
       editor: this.editor,
-      state,
-      as: this.node.isInline ? "span" : "div",
+      state: state,
+      as,
+      className:
+        `node-${this.node.type.name} ${this.options.className || ""}`.trim(),
     });
   }
 
@@ -135,7 +256,7 @@ class SolidNodeView extends NodeView<
 
   public update(
     node: ProseMirrorNode,
-    decorations: DecorationWithType[]
+    decorations: DecorationWithType[],
   ): boolean {
     if (node.type !== this.node.type) {
       return false;
@@ -171,7 +292,7 @@ class SolidNodeView extends NodeView<
   public setSelection(
     anchor: number,
     head: number,
-    root: Document | ShadowRoot
+    root: Document | ShadowRoot,
   ): void {
     this.options.setSelection?.(anchor, head, root);
   }
@@ -193,11 +314,47 @@ class SolidNodeView extends NodeView<
     this.renderer.setState?.((state) => ({ ...state, ...props }));
     this.maybeMoveContentDOM();
   }
+  handleSelectionUpdate() {
+    if (this.selectionRafId) {
+      cancelAnimationFrame(this.selectionRafId);
+      this.selectionRafId = null;
+    }
+
+    this.selectionRafId = requestAnimationFrame(() => {
+      this.selectionRafId = null;
+      // Avoid resolving getPos() after ProseMirror has detached this node view.
+      const pos = this.currentPos;
+      if (typeof pos !== "number") {
+        return;
+      }
+
+      const isSelected = isNodeViewSelected({
+        selection: this.editor.state.selection,
+        pos,
+        nodeSize: this.node.nodeSize,
+        selectedOnTextSelection: this.options.selectedOnTextSelection,
+      });
+
+      if (isSelected) {
+        if (this.renderer.state().selected) {
+          return;
+        }
+
+        this.selectNode();
+      } else {
+        if (!this.renderer.state().selected) {
+          return;
+        }
+
+        this.deselectNode();
+      }
+    });
+  }
 }
 
 const SolidNodeViewRenderer = (
   component: Component,
-  options?: Partial<SolidNodeViewRendererOptions>
+  options?: Partial<SolidNodeViewRendererOptions>,
 ): NodeViewRenderer => {
   return (props: NodeViewRendererProps) => {
     const { renderers, setRenderers } = props.editor as SolidEditor;
@@ -209,10 +366,10 @@ const SolidNodeViewRenderer = (
     return new SolidNodeView(
       component,
       props,
-      options
+      options,
     ) as unknown as ProseMirrorNodeView;
   };
 };
 
-export { SolidNodeViewRenderer };
 export type { SolidNodeViewRendererOptions };
+export { SolidNodeViewRenderer };
