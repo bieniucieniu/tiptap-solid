@@ -1,4 +1,5 @@
-import { createComponent, createContext, type JSX, useContext } from "solid-js";
+import type { JSX } from "solid-js";
+import { createContext, useContext } from "solid-js";
 
 export interface SolidNodeViewContextProps {
   onDragStart?: (event: DragEvent) => void;
@@ -19,18 +20,5 @@ export const SolidNodeViewContext = createContext<SolidNodeViewContextProps>({
     // no-op
   },
 });
-
-export const SolidNodeViewContentProvider = ({
-  children,
-  content,
-}: {
-  children: JSX.Element;
-  content: JSX.Element;
-}) => {
-  return createComponent(SolidNodeViewContext.Provider, {
-    value: { nodeViewContentChildren: content },
-    children,
-  });
-};
 
 export const useSolidNodeView = () => useContext(SolidNodeViewContext);

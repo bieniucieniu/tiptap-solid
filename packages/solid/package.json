@@ -1,0 +1,54 @@
+{
+  "name": "tiptap-solid",
+  "description": "SolidJS components for tiptap",
+  "version": "0.0.1",
+  "homepage": "https://tiptap.dev",
+  "keywords": [
+    "tiptap",
+    "tiptap solid components"
+  ],
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./menus": {
+      "types": "./dist/menus/index.d.ts",
+      "import": "./dist/menus/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "files": [
+    "src",
+    "dist"
+  ],
+  "dependencies": {
+    "fast-equals": "^5.3.3"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.14",
+    "@tiptap/core": "^3.22.5",
+    "@tiptap/pm": "^3.22.5",
+    "solid-js": "^1.9.0",
+    "tsdown": "latest"
+  },
+  "optionalDependencies": {
+    "@tiptap/extension-bubble-menu": "^3.22.5",
+    "@tiptap/extension-floating-menu": "^3.22.5"
+  },
+  "peerDependencies": {
+    "@tiptap/core": "^3.22.5",
+    "@tiptap/pm": "^3.22.5",
+    "solid-js": "^1.9.0"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "lint": "biome check ./src",
+    "format": "biome format ./src --write"
+
+  }
+}
