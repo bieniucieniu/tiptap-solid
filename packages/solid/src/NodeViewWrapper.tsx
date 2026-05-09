@@ -9,19 +9,19 @@ export interface NodeViewWrapperProps extends ComponentProps<"div"> {
 }
 
 export function NodeViewWrapper(props: NodeViewWrapperProps) {
-  const [local, rest] = splitProps(props, ["as", "style", "ref"]);
-  const { onDragStart } = useSolidNodeView();
+  const [, rest] = splitProps(props, ["as", "style", "ref"]);
+  const nv = useSolidNodeView();
 
   return (
     <Dynamic
-      component={local.as || "div"}
+      component={props.as || "div"}
       {...rest}
-      ref={local.ref}
+      ref={props.ref}
       data-node-view-wrapper=""
-      onDragStart={onDragStart}
+      onDragStart={nv.onDragStart}
       style={{
         "white-space": "normal",
-        ...(typeof local.style === "object" ? local.style : {}),
+        ...(typeof props.style === "object" ? props.style : {}),
       }}
     />
   );

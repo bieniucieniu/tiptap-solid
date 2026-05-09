@@ -9,21 +9,21 @@ export interface NodeViewContentProps extends ComponentProps<"div"> {
 }
 
 export function NodeViewContent(props: NodeViewContentProps) {
-  const [local, rest] = splitProps(props, ["as", "style"]);
-  const { nodeViewContentRef, nodeViewContentChildren } = useSolidNodeView();
+  const [, rest] = splitProps(props, ["as", "style"]);
+  const nv = useSolidNodeView();
 
   return (
     <Dynamic
-      component={local.as || "div"}
+      component={props.as || "div"}
       {...rest}
-      ref={nodeViewContentRef}
+      ref={nv.nodeViewContentRef}
       data-node-view-content=""
       style={{
         "white-space": "pre-wrap",
-        ...(typeof local.style === "object" ? local.style : {}),
+        ...(typeof props.style === "object" ? props.style : {}),
       }}
     >
-      {nodeViewContentChildren}
+      {nv.nodeViewContentChildren}
     </Dynamic>
   );
 }

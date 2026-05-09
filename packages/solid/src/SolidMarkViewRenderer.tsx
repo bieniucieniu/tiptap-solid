@@ -25,14 +25,14 @@ export type MarkViewContentProps = {
 } & ComponentProps<"span">;
 
 export const MarkViewContent = (props: MarkViewContentProps) => {
-  const [local, rest] = splitProps(props, ["as"]);
-  const { markViewContentRef } = useContext(SolidMarkViewContext);
+  const [, rest] = splitProps(props, ["as"]);
+  const ctx = useContext(SolidMarkViewContext);
 
   return (
     <Dynamic
-      component={local.as || "span"}
+      component={props.as || "span"}
       {...rest}
-      ref={markViewContentRef}
+      ref={ctx.markViewContentRef}
       data-mark-view-content=""
     />
   );

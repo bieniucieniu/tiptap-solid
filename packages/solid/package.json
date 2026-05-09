@@ -11,11 +11,13 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     },
     "./menus": {
       "types": "./dist/menus/index.d.ts",
-      "import": "./dist/menus/index.js"
+      "import": "./dist/menus/index.js",
+      "default": "./dist/menus/index.js"
     }
   },
   "main": "./dist/index.js",
@@ -48,7 +50,8 @@
   },
   "scripts": {
     "build": "tsdown",
-    "lint": "biome check ./src",
+    "lint": "biome lint ./src",
+    "check": "biome check ./src --write",
     "format": "biome format ./src --write"
   }
 }

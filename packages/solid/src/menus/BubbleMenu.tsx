@@ -8,16 +8,13 @@ import { useCurrentEditor } from "../Context";
 import { getAutoPluginKey } from "./getAutoPluginKey";
 import { useMenuElementProps } from "./useMenuElementProps";
 
-export type BubbleMenuProps = Omit<
-  BubbleMenuPluginProps,
-  "element" | "editor"
-> & {
-  editor?: BubbleMenuPluginProps["editor"];
-  children: JSX.Element;
-  class?: string;
-  style?: JSX.CSSProperties;
-  [key: string]: any;
-};
+type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
+
+export type BubbleMenuProps = Optional<
+  Omit<Optional<BubbleMenuPluginProps, "pluginKey">, "element">,
+  "editor"
+> &
+  JSX.HTMLAttributes<HTMLDivElement>;
 
 export const BubbleMenu = (props: BubbleMenuProps) => {
   const [, rest] = splitProps(props, [
@@ -30,6 +27,7 @@ export const BubbleMenu = (props: BubbleMenuProps) => {
     "getReferencedVirtualElement",
     "options",
     "children",
+    "ref",
   ]);
 
   const menuEl = document.createElement("div");
@@ -37,17 +35,29 @@ export const BubbleMenu = (props: BubbleMenuProps) => {
 
   useMenuElementProps(menuEl, rest);
 
-  const { editor: currentEditor } = useCurrentEditor();
+  createEffect(() => {
+    if (typeof props.ref === "function") {
+      props.ref(menuEl);
+    }
+  });
+
+  const currentEditorCtx = useCurrentEditor();
+
+  /**
+   * The editor instance where the bubble menu plugin will be registered.
+   */
+  const pluginEditor = () => props.editor || currentEditorCtx.editor();
 
   createEffect(() => {
-    const pluginEditor = props.editor || currentEditor();
+    const editor = pluginEditor();
 
-    if (!pluginEditor || pluginEditor.isDestroyed) {
+    if (!editor || editor.isDestroyed) {
       return;
     }
 
-    menuEl.style.visibility = "hidden";
-    menuEl.style.position = "absolute";
+    const bubbleMenuElement = menuEl;
+    bubbleMenuElement.style.visibility = "hidden";
+    bubbleMenuElement.style.position = "absolute";
 
     const plugin = BubbleMenuPlugin({
       updateDelay: props.updateDelay,
@@ -57,29 +67,31 @@ export const BubbleMenu = (props: BubbleMenuProps) => {
       shouldShow: props.shouldShow,
       getReferencedVirtualElement: props.getReferencedVirtualElement,
       options: props.options,
-      editor: pluginEditor,
-      element: menuEl,
+      editor: editor,
+      element: bubbleMenuElement,
     });
 
-    pluginEditor.registerPlugin(plugin);
+    editor.registerPlugin(plugin);
 
     onCleanup(() => {
-      pluginEditor.unregisterPlugin(resolvedPluginKey);
-      if (menuEl.parentNode) {
-        menuEl.parentNode.removeChild(menuEl);
-      }
+      editor.unregisterPlugin(resolvedPluginKey);
+      window.requestAnimationFrame(() => {
+        if (bubbleMenuElement.parentNode) {
+          bubbleMenuElement.parentNode.removeChild(bubbleMenuElement);
+        }
+      });
     });
   });
 
   createEffect(() => {
-    const pluginEditor = props.editor || currentEditor();
+    const editor = pluginEditor();
 
-    if (!pluginEditor || pluginEditor.isDestroyed) {
+    if (!editor || editor.isDestroyed) {
       return;
     }
 
-    pluginEditor.view.dispatch(
-      pluginEditor.state.tr.setMeta(resolvedPluginKey, {
+    editor.view.dispatch(
+      editor.state.tr.setMeta(resolvedPluginKey, {
         type: "updateOptions",
         options: {
           updateDelay: props.updateDelay,

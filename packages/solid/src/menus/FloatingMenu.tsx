@@ -8,19 +8,17 @@ import { useCurrentEditor } from "../Context";
 import { getAutoPluginKey } from "./getAutoPluginKey";
 import { useMenuElementProps } from "./useMenuElementProps";
 
+type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
+
 export type FloatingMenuProps = Omit<
-  FloatingMenuPluginProps,
+  Optional<FloatingMenuPluginProps, "pluginKey">,
   "element" | "editor"
 > & {
-  editor?: FloatingMenuPluginProps["editor"];
-  children: JSX.Element;
-  class?: string;
-  style?: JSX.CSSProperties;
-  [key: string]: any;
-};
+  editor: FloatingMenuPluginProps["editor"] | null;
+} & JSX.HTMLAttributes<HTMLDivElement>;
 
 export const FloatingMenu = (props: FloatingMenuProps) => {
-  const [local, rest] = splitProps(props, [
+  const [, rest] = splitProps(props, [
     "pluginKey",
     "editor",
     "updateDelay",
@@ -29,66 +27,81 @@ export const FloatingMenu = (props: FloatingMenuProps) => {
     "shouldShow",
     "options",
     "children",
+    "ref",
   ]);
 
   const menuEl = document.createElement("div");
-  const resolvedPluginKey = getAutoPluginKey(local.pluginKey, "floatingMenu");
+  const resolvedPluginKey = getAutoPluginKey(props.pluginKey, "floatingMenu");
 
   useMenuElementProps(menuEl, rest);
 
-  const { editor: currentEditor } = useCurrentEditor();
+  createEffect(() => {
+    if (typeof props.ref === "function") {
+      props.ref(menuEl);
+    }
+  });
+
+  const currentEditorCtx = useCurrentEditor();
+
+  /**
+   * The editor instance where the floating menu plugin will be registered.
+   */
+  const pluginEditor = () => props.editor || currentEditorCtx.editor();
 
   createEffect(() => {
-    const pluginEditor = local.editor || currentEditor();
+    const editor = pluginEditor();
 
-    if (!pluginEditor || pluginEditor.isDestroyed) {
+    if (!editor || editor.isDestroyed) {
       return;
     }
 
-    menuEl.style.visibility = "hidden";
-    menuEl.style.position = "absolute";
+    const floatingMenuElement = menuEl;
+    floatingMenuElement.style.visibility = "hidden";
+    floatingMenuElement.style.position = "absolute";
 
     const plugin = FloatingMenuPlugin({
-      updateDelay: local.updateDelay,
-      resizeDelay: local.resizeDelay,
-      appendTo: local.appendTo,
+      updateDelay: props.updateDelay,
+      resizeDelay: props.resizeDelay,
+      appendTo: props.appendTo,
       pluginKey: resolvedPluginKey,
-      shouldShow: local.shouldShow,
-      options: local.options,
-      editor: pluginEditor,
-      element: menuEl,
+      shouldShow: props.shouldShow,
+      options: props.options,
+      editor: editor,
+      element: floatingMenuElement,
     });
 
-    pluginEditor.registerPlugin(plugin);
+    editor.registerPlugin(plugin);
 
     onCleanup(() => {
-      pluginEditor.unregisterPlugin(resolvedPluginKey);
-      if (menuEl.parentNode) {
-        menuEl.parentNode.removeChild(menuEl);
-      }
+      editor.unregisterPlugin(resolvedPluginKey);
+      window.requestAnimationFrame(() => {
+        if (floatingMenuElement.parentNode) {
+          floatingMenuElement.parentNode.removeChild(floatingMenuElement);
+        }
+      });
     });
   });
 
   createEffect(() => {
-    const pluginEditor = local.editor || currentEditor();
+    const editor = pluginEditor();
 
-    if (!pluginEditor || pluginEditor.isDestroyed) {
+    if (!editor || editor.isDestroyed) {
       return;
     }
 
-    pluginEditor.view.dispatch(
-      pluginEditor.state.tr.setMeta(resolvedPluginKey, {
+    editor.view.dispatch(
+      editor.state.tr.setMeta(resolvedPluginKey, {
         type: "updateOptions",
         options: {
-          updateDelay: local.updateDelay,
-          resizeDelay: local.resizeDelay,
-          shouldShow: local.shouldShow,
-          options: local.options,
-          appendTo: local.appendTo,
+          updateDelay: props.updateDelay,
+          resizeDelay: props.resizeDelay,
+          shouldShow: props.shouldShow,
+          options: props.options,
+          appendTo: props.appendTo,
         },
       }),
     );
   });
 
-  return <Portal mount={menuEl}>{local.children}</Portal>;
+  return <Portal mount={menuEl}>{props.children}</Portal>;
 };

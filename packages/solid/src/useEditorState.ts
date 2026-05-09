@@ -1,6 +1,13 @@
 import type { Editor } from "@tiptap/core";
 import { deepEqual } from "fast-equals";
-import { createEffect, createMemo, createSignal, onCleanup } from "solid-js";
+import {
+  type Accessor,
+  createEffect,
+  createMemo,
+  createSignal,
+  onCleanup,
+} from "solid-js";
+import { useTiptapEditor } from "./Tiptap";
 
 export type EditorStateSnapshot<TEditor extends Editor | null = Editor | null> =
   {
@@ -15,7 +22,7 @@ export type UseEditorStateOptions<
   /**
    * The editor instance.
    */
-  editor: () => TEditor;
+  editor?: Accessor<TEditor>;
   /**
    * A selector function to determine the value to compare for re-rendering.
    */
@@ -29,11 +36,12 @@ export type UseEditorStateOptions<
 
 export function useEditorState<TSelectorResult>(
   options: UseEditorStateOptions<TSelectorResult, Editor | null>,
-): () => TSelectorResult | null {
+): Accessor<TSelectorResult | null> {
   const [transactionNumber, setTransactionNumber] = createSignal(0);
+  const getEditor = useTiptapEditor(options.editor);
 
   createEffect(() => {
-    const editor = options.editor();
+    const editor = getEditor();
 
     if (!editor) {
       return;
@@ -51,7 +59,7 @@ export function useEditorState<TSelectorResult>(
   });
 
   const selectedState = createMemo((prev: TSelectorResult | null) => {
-    const editor = options.editor();
+    const editor = getEditor();
     const next = options.selector({
       editor,
       transactionNumber: transactionNumber(),

@@ -39,10 +39,10 @@ function getInstance(): ContentComponent {
 
 export const EditorContent = (props: EditorContentProps) => {
   let editorContentRef: HTMLDivElement | undefined;
-  const [local, rest] = splitProps(props, ["editor"]);
+  const [, rest] = splitProps(props, ["editor"]);
 
   onMount(() => {
-    const editor = local.editor as EditorWithContentComponent | null;
+    const editor = props.editor as EditorWithContentComponent | null;
 
     if (editor && !editor.isDestroyed && editor.view.dom?.parentNode) {
       if (editor.contentComponent) {
@@ -65,7 +65,7 @@ export const EditorContent = (props: EditorContentProps) => {
   });
 
   onCleanup(() => {
-    const editor = local.editor as EditorWithContentComponent | null;
+    const editor = props.editor as EditorWithContentComponent | null;
 
     if (!editor) {
       return;
@@ -103,7 +103,7 @@ export const EditorContent = (props: EditorContentProps) => {
       <For
         each={Object.values(
           (
-            local.editor as EditorWithContentComponent
+            props.editor as EditorWithContentComponent
           )?.contentComponent?.renderers() || {},
         )}
       >
