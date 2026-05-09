@@ -1,20 +1,74 @@
+import { A, Route, Router, type RouteSectionProps } from "@solidjs/router";
 import type { Component } from "solid-js";
-import { EditorContent, useEditor } from "tiptap-solid";
+import { BasicEditor } from "./components/editors/Basic";
+import { MarkdownEditor } from "./components/editors/Markdown";
+import { MenusEditor } from "./components/editors/Menus";
 
-const App: Component = () => {
-	const editor = useEditor({
-		extensions: [],
-		content: "<p>Hello World! 🌎️</p>",
-	});
+// --- Main Layout ---
 
-	return (
-		<div style={{ padding: "2rem" }}>
-			<h1>TipTap Solid Example</h1>
-			<div class="editor-container">
-				<EditorContent editor={editor()} />
-			</div>
-		</div>
-	);
+const Navigation = () => (
+  <nav class="flex gap-2 mb-8 p-1 bg-muted rounded-xl border w-fit shadow-sm">
+    <A
+      href="/"
+      end
+      class="px-5 py-2.5 rounded-lg transition-all font-semibold text-sm flex items-center gap-2"
+      activeClass="bg-white shadow-sm text-primary"
+      inactiveClass="text-muted-foreground hover:text-foreground hover:bg-white/50"
+    >
+      Basic
+    </A>
+    <A
+      href="/markdown"
+      class="px-5 py-2.5 rounded-lg transition-all font-semibold text-sm flex items-center gap-2"
+      activeClass="bg-white shadow-sm text-primary"
+      inactiveClass="text-muted-foreground hover:text-foreground hover:bg-white/50"
+    >
+      Markdown
+    </A>
+    <A
+      href="/menus"
+      class="px-5 py-2.5 rounded-lg transition-all font-semibold text-sm flex items-center gap-2"
+      activeClass="bg-white shadow-sm text-primary"
+      inactiveClass="text-muted-foreground hover:text-foreground hover:bg-white/50"
+    >
+      Menus
+    </A>
+  </nav>
+);
+
+const App: Component<RouteSectionProps> = (props) => {
+  return (
+    <div class="max-w-5xl mx-auto py-16 px-6">
+      <header class="mb-10 space-y-2">
+        <h1 class="text-5xl font-black tracking-tight lg:text-6xl text-primary flex items-center gap-4">
+          Tiptap{" "}
+          <span class="bg-primary/10 text-primary/70 px-3 py-1 rounded-2xl text-3xl font-bold border border-primary/20">
+            Solid
+          </span>
+        </h1>
+        <p class="text-xl text-muted-foreground font-medium max-w-2xl leading-relaxed">
+          The power of <span class="text-foreground">ProseMirror</span>, the
+          reactivity of <span class="text-foreground">SolidJS</span>, and the
+          speed of <span class="text-foreground">Tailwind 4</span>.
+        </p>
+      </header>
+
+      <Navigation />
+
+      <main class="min-h-125">{props.children}</main>
+
+      <footer class="mt-16 pt-10 border-t text-center text-sm text-muted-foreground/60 font-medium">
+        <p>Built with SolidJS, Tailwind 4, and Tiptap Solid.</p>
+        <p class="mt-1 text-xs">© 2024 tip-tap-solid team</p>
+      </footer>
+    </div>
+  );
 };
 
-export default App;
+export default () => (
+  <Router root={App}>
+    <Route path="/" component={BasicEditor} />
+    <Route path="/markdown" component={MarkdownEditor} />
+    <Route path="/menus" component={MenusEditor} />
+  </Router>
+);
