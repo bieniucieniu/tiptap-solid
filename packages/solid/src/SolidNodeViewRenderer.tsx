@@ -20,10 +20,10 @@ import type {
 } from "@tiptap/pm/view";
 import type { Component } from "solid-js";
 
-import type { EditorWithContentComponent } from "./Editor.js";
-import { SolidRenderer } from "./SolidRenderer.js";
-import type { SolidNodeViewProps } from "./types.js";
-import { SolidNodeViewContext } from "./useSolidNodeView.js";
+import type { EditorWithContentComponent } from "./editor";
+import { SolidRenderer } from "./SolidRenderer";
+import type { SolidNodeViewProps } from "./types";
+import { SolidNodeViewContext } from "./useSolidNodeView";
 
 export interface SolidNodeViewRendererOptions extends NodeViewRendererOptions {
   update:

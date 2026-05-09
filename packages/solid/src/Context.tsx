@@ -2,9 +2,9 @@ import type { Editor } from "@tiptap/core";
 import type { ComponentProps, JSX } from "solid-js";
 import { createContext, splitProps, useContext } from "solid-js";
 
-import { EditorContent } from "./EditorContent.js";
-import type { UseEditorOptions } from "./useEditor.js";
-import { useEditor } from "./useEditor.js";
+import { EditorContent } from "./EditorContent";
+import type { UseEditorOptions } from "./useEditor";
+import { useEditor } from "./useEditor";
 
 export type EditorContextValue = {
   editor: () => Editor | null;

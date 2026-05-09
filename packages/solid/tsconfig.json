@@ -10,8 +10,7 @@
     "types": ["solid-js", "solid-js/web"],
     "strict": true,
     "skipLibCheck": true,
-    "declaration": true,
-    "outDir": "dist"
+    "declaration": true
   },
   "include": ["src"]
 }

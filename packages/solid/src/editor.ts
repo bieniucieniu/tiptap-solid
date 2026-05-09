@@ -1,7 +1,7 @@
 import type { Editor } from "@tiptap/core";
 import type { JSX } from "solid-js";
 
-import type { SolidRenderer } from "./SolidRenderer.js";
+import type { SolidRenderer } from "./SolidRenderer";
 
 export type AnyProps = Record<string, any>;
 

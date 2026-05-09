@@ -1,9 +1,9 @@
 import type { Editor } from "@tiptap/core";
 import type { JSX } from "solid-js";
 import { createContext, useContext } from "solid-js";
-import { EditorContext } from "./Context.js";
-import { EditorContent, type EditorContentProps } from "./EditorContent.js";
-import { type EditorStateSnapshot, useEditorState } from "./useEditorState.js";
+import { EditorContext } from "./Context";
+import { EditorContent, type EditorContentProps } from "./EditorContent";
+import { type EditorStateSnapshot, useEditorState } from "./useEditorState";
 
 /**
  * The shape of the Solid context used by the `<Tiptap />` components.

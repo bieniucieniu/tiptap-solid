@@ -2,7 +2,7 @@ import type { Editor } from "@tiptap/core";
 import type { Component } from "solid-js";
 import { createStore, reconcile } from "solid-js/store";
 
-import type { AnyProps, EditorWithContentComponent } from "./Editor.js";
+import type { AnyProps, EditorWithContentComponent } from "./editor";
 
 export interface SolidRendererOptions {
   editor: Editor;

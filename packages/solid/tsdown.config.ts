@@ -1,14 +1,18 @@
-import { defineConfig } from 'tsdown'
+import { defineConfig } from "tsdown";
 
+import solid from "unplugin-solid/rolldown";
 export default defineConfig({
-  entry: [
-    'src/index.ts',
-    'src/menus/index.ts',
-  ],
-  format: ['esm'],
+  entry: ["src/index.ts", "src/menus/index.ts"],
+  plugins: [solid()],
+  format: ["esm"],
   clean: true,
   dts: true,
   bundle: true,
-  external: [/^@tiptap\//, 'solid-js', 'solid-js/web'],
-  platform: 'browser',
-})
+  deps: {
+    neverBundle: [/^@tiptap\//, "solid-js", "solid-js/web"],
+  },
+  platform: "browser",
+  outputOptions: {
+    dir: "dist",
+  },
+});

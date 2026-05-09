@@ -1,2 +1,2 @@
-export * from "./BubbleMenu.js";
-export * from "./FloatingMenu.js";
+export * from "./BubbleMenu";
+export * from "./FloatingMenu";

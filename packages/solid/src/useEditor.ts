@@ -1,6 +1,6 @@
 import { Editor, type EditorOptions } from "@tiptap/core";
-import { createSignal, onCleanup, onMount } from "solid-js";
-import { useEditorState } from "./useEditorState.js";
+import { type Accessor, createSignal, onCleanup, onMount } from "solid-js";
+import { useEditorState } from "./useEditorState";
 
 const isSSR = typeof window === "undefined";
 
@@ -20,7 +20,13 @@ export type UseEditorOptions = Partial<EditorOptions> & {
   shouldRerenderOnTransaction?: boolean;
 };
 
-export function useEditor(options: UseEditorOptions = {}): () => Editor | null {
+export function useEditor(
+  options: UseEditorOptions & { immediatelyRender: false },
+): Accessor<Editor | null>;
+export function useEditor(options?: UseEditorOptions): Accessor<Editor>;
+export function useEditor(
+  options: UseEditorOptions = {},
+): Accessor<Editor | null> {
   const [editor, setEditor] = createSignal<Editor | null>(null);
 
   onMount(() => {

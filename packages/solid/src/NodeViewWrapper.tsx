@@ -2,7 +2,7 @@ import type { ComponentProps } from "solid-js";
 import { splitProps } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { useSolidNodeView } from "./useSolidNodeView.js";
+import { useSolidNodeView } from "./useSolidNodeView";
 
 export interface NodeViewWrapperProps extends ComponentProps<"div"> {
   as?: string;

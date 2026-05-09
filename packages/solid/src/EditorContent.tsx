@@ -3,7 +3,7 @@ import type { ComponentProps, JSX } from "solid-js";
 import { createSignal, For, onCleanup, onMount, splitProps } from "solid-js";
 import { Dynamic, Portal } from "solid-js/web";
 
-import type { ContentComponent, EditorWithContentComponent } from "./Editor";
+import type { ContentComponent, EditorWithContentComponent } from "./editor";
 import type { SolidRenderer } from "./SolidRenderer";
 
 export interface EditorContentProps extends ComponentProps<"div"> {

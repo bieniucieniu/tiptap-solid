@@ -8,7 +8,7 @@ import type { Component, ComponentProps } from "solid-js";
 import { createContext, splitProps, useContext } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { SolidRenderer } from "./SolidRenderer.js";
+import { SolidRenderer } from "./SolidRenderer";
 
 export interface MarkViewContextProps {
   markViewContentRef: (element: HTMLElement | null) => void;

@@ -4,9 +4,9 @@ import {
 } from "@tiptap/extension-bubble-menu";
 import { createEffect, type JSX, onCleanup, splitProps } from "solid-js";
 import { Portal } from "solid-js/web";
-import { useCurrentEditor } from "../Context.js";
-import { getAutoPluginKey } from "./getAutoPluginKey.js";
-import { useMenuElementProps } from "./useMenuElementProps.js";
+import { useCurrentEditor } from "../Context";
+import { getAutoPluginKey } from "./getAutoPluginKey";
+import { useMenuElementProps } from "./useMenuElementProps";
 
 export type BubbleMenuProps = Omit<
   BubbleMenuPluginProps,
