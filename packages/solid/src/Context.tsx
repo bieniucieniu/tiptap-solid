@@ -1,17 +1,19 @@
 import type { Editor } from "@tiptap/core";
 import type { ComponentProps, JSX } from "solid-js";
-import { type Accessor, createContext, splitProps, useContext } from "solid-js";
+import { createContext, splitProps, useContext } from "solid-js";
 
 import { EditorContent } from "./EditorContent";
 import type { UseEditorOptions } from "./useEditor";
 import { useEditor } from "./useEditor";
 
 export type EditorContextValue = {
-  editor: Accessor<Editor | null>;
+  get editor(): Editor | null;
 };
 
 export const EditorContext = createContext<EditorContextValue>({
-  editor: () => null,
+  get editor() {
+    return null;
+  },
 });
 
 /**
@@ -40,7 +42,11 @@ export function EditorProvider(props: EditorProviderProps) {
   ]);
   const editor = useEditor(editorOptions);
 
-  const contextValue = { editor };
+  const contextValue = {
+    get editor() {
+      return editor();
+    },
+  };
 
   return (
     <EditorContext.Provider value={contextValue}>

@@ -89,7 +89,9 @@ export function TiptapWrapper(props: TiptapWrapperProps) {
   };
 
   const legacyContextValue = {
-    editor: props.editor,
+    get editor() {
+      return props.editor();
+    },
   };
 
   return (

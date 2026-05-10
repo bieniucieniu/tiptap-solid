@@ -49,7 +49,7 @@ export const BubbleMenu = (props: BubbleMenuProps) => {
   /**
    * The editor instance where the bubble menu plugin will be registered.
    */
-  const pluginEditor = () => props.editor || currentEditorCtx.editor();
+  const pluginEditor = () => props.editor || currentEditorCtx.editor;
 
   createEffect(() => {
     const editor = pluginEditor();

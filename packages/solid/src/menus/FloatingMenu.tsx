@@ -48,7 +48,7 @@ export const FloatingMenu = (props: FloatingMenuProps) => {
   /**
    * The editor instance where the floating menu plugin will be registered.
    */
-  const pluginEditor = () => props.editor || currentEditorCtx.editor();
+  const pluginEditor = () => props.editor || currentEditorCtx.editor;
 
   createEffect(() => {
     const editor = pluginEditor();
