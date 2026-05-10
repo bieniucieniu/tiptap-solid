@@ -46,11 +46,6 @@ const App: Component<RouteSectionProps> = (props) => {
             Solid
           </span>
         </h1>
-        <p class="text-xl text-muted-foreground font-medium max-w-2xl leading-relaxed">
-          The power of <span class="text-foreground">ProseMirror</span>, the
-          reactivity of <span class="text-foreground">SolidJS</span>, and the
-          speed of <span class="text-foreground">Tailwind 4</span>.
-        </p>
       </header>
 
       <Navigation />
