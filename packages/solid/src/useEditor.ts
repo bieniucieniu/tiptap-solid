@@ -73,67 +73,68 @@ function compareOptions(a: UseEditorOptions, b: UseEditorOptions) {
   });
 }
 
+function shouldRecreate(a: UseEditorOptions, b: UseEditorOptions) {
+  if (a.extensions !== b.extensions) {
+    if (!a.extensions || !b.extensions) {
+      return true;
+    }
+    if (a.extensions.length !== b.extensions.length) {
+      return true;
+    }
+    if (
+      a.extensions.some(
+        (extension, index) => extension !== b.extensions?.[index],
+      )
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export function useEditor(
-  options: UseEditorOptions & { immediatelyRender: false },
-  deps?: any[],
+  options: Accessor<UseEditorOptions & { immediatelyRender: false }>,
 ): Accessor<Editor | null>;
 export function useEditor(
-  options?: UseEditorOptions,
-  deps?: any[],
+  options: Accessor<UseEditorOptions>,
 ): Accessor<Editor>;
 export function useEditor(
-  options: UseEditorOptions = {},
-  deps: any[] = [],
+  options: Accessor<UseEditorOptions> = () => ({}),
 ): Accessor<Editor | null> {
   const [editor, setEditor] = createSignal<Editor | null>(null);
   let instanceId = "";
   let isComponentMounted = false;
   let scheduledDestructionTimeout: ReturnType<typeof setTimeout> | undefined;
-  let previousDeps: any[] | null = null;
-
-  // We need to keep track of the latest options for callbacks
-  let currentOptions = options;
 
   const createEditorInstance = (opts: UseEditorOptions): Editor => {
     const instance = new Editor({
       ...opts,
       // Always call the most recent version of the callback function by default
-      onBeforeCreate: (...args) => currentOptions.onBeforeCreate?.(...args),
-      onBlur: (...args) => currentOptions.onBlur?.(...args),
-      onCreate: (...args) => currentOptions.onCreate?.(...args),
-      onDestroy: (...args) => currentOptions.onDestroy?.(...args),
-      onFocus: (...args) => currentOptions.onFocus?.(...args),
-      onSelectionUpdate: (...args) =>
-        currentOptions.onSelectionUpdate?.(...args),
-      onTransaction: (...args) => currentOptions.onTransaction?.(...args),
-      onUpdate: (...args) => currentOptions.onUpdate?.(...args),
-      onContentError: (...args) => currentOptions.onContentError?.(...args),
-      onDrop: (...args) => currentOptions.onDrop?.(...args),
-      onPaste: (...args) => currentOptions.onPaste?.(...args),
-      onDelete: (...args) => currentOptions.onDelete?.(...args),
+      onBeforeCreate: (...args) => options().onBeforeCreate?.(...args),
+      onBlur: (...args) => options().onBlur?.(...args),
+      onCreate: (...args) => options().onCreate?.(...args),
+      onDestroy: (...args) => options().onDestroy?.(...args),
+      onFocus: (...args) => options().onFocus?.(...args),
+      onSelectionUpdate: (...args) => options().onSelectionUpdate?.(...args),
+      onTransaction: (...args) => options().onTransaction?.(...args),
+      onUpdate: (...args) => options().onUpdate?.(...args),
+      onContentError: (...args) => options().onContentError?.(...args),
+      onDrop: (...args) => options().onDrop?.(...args),
+      onPaste: (...args) => options().onPaste?.(...args),
+      onDelete: (...args) => options().onDelete?.(...args),
     });
 
     instanceId = Math.random().toString(36).slice(2, 9);
     return instance;
   };
 
-  const refreshEditorInstance = () => {
+  const refreshEditorInstance = (opts: UseEditorOptions) => {
     const currentInstance = untrack(editor);
     if (currentInstance && !currentInstance.isDestroyed) {
-      if (previousDeps !== null) {
-        const depsAreEqual =
-          previousDeps.length === deps.length &&
-          previousDeps.every((dep, i) => dep === deps[i]);
-
-        if (depsAreEqual) {
-          return;
-        }
-      }
       currentInstance.destroy();
     }
 
-    setEditor(createEditorInstance(options));
-    previousDeps = [...deps];
+    setEditor(createEditorInstance(opts));
   };
 
   const scheduleDestroy = (instance: Editor | null, id: string) => {
@@ -145,7 +146,7 @@ export function useEditor(
       if (isComponentMounted && instanceId === id) {
         // If still mounted on the following tick, with the same instanceId, do not destroy the editor
         // just re-apply options as they might have changed
-        instance.setOptions(currentOptions);
+        instance.setOptions(untrack(options));
         return;
       }
 
@@ -160,7 +161,8 @@ export function useEditor(
 
   // Initial creation logic
   const getInitialEditor = () => {
-    if (options.immediatelyRender === undefined) {
+    const opts = untrack(options);
+    if (opts.immediatelyRender === undefined) {
       if (isSSR || isNext) {
         if (isDev) {
           throw new Error(
@@ -169,17 +171,17 @@ export function useEditor(
         }
         return null;
       }
-      return createEditorInstance(options);
+      return createEditorInstance(opts);
     }
 
-    if (options.immediatelyRender && isSSR && isDev) {
+    if (opts.immediatelyRender && isSSR && isDev) {
       throw new Error(
         "Tiptap Error: SSR has been detected, and `immediatelyRender` has been set to `true` this is an unsupported configuration that may result in errors, explicitly set `immediatelyRender` to `false` to avoid hydration mismatches.",
       );
     }
 
-    if (options.immediatelyRender) {
-      return createEditorInstance(options);
+    if (opts.immediatelyRender) {
+      return createEditorInstance(opts);
     }
 
     return null;
@@ -188,7 +190,6 @@ export function useEditor(
   const initial = getInitialEditor();
   if (initial) {
     setEditor(initial);
-    previousDeps = [...deps];
   }
 
   onMount(() => {
@@ -197,10 +198,7 @@ export function useEditor(
 
     const instance = untrack(editor);
     if (!instance && !isSSR) {
-      refreshEditorInstance();
-    } else if (instance && deps.length > 0) {
-      // If we already have an instance but deps changed between creation and mount
-      refreshEditorInstance();
+      refreshEditorInstance(untrack(options));
     }
   });
 
@@ -209,27 +207,26 @@ export function useEditor(
     scheduleDestroy(untrack(editor), instanceId);
   });
 
-  // Re-sync options
-  createEffect(() => {
-    currentOptions = options;
-    const instance = editor();
-    if (instance && !instance.isDestroyed && deps.length === 0) {
-      if (!compareOptions(options, instance.options)) {
-        instance.setOptions({
-          ...options,
-          editable: options.editable ?? instance.isEditable,
-        });
-      }
-    }
-  });
-
-  // Handle deps changes
+  // Re-sync options or recreate
   createEffect(
     on(
-      () => [...deps],
-      () => {
-        if (isComponentMounted) {
-          refreshEditorInstance();
+      options,
+      (opts) => {
+        const instance = untrack(editor);
+        if (!instance || instance.isDestroyed) {
+          if (isComponentMounted) {
+            refreshEditorInstance(opts);
+          }
+          return;
+        }
+
+        if (shouldRecreate(opts, instance.options)) {
+          refreshEditorInstance(opts);
+        } else if (!compareOptions(opts, instance.options)) {
+          instance.setOptions({
+            ...opts,
+            editable: opts.editable ?? instance.isEditable,
+          });
         }
       },
       { defer: true },
@@ -241,14 +238,15 @@ export function useEditor(
   useEditorState({
     editor,
     selector: ({ transactionNumber }) => {
+      const opts = options();
       if (
-        options.shouldRerenderOnTransaction === false ||
-        options.shouldRerenderOnTransaction === undefined
+        opts.shouldRerenderOnTransaction === false ||
+        opts.shouldRerenderOnTransaction === undefined
       ) {
         return null;
       }
 
-      if (options.immediatelyRender && transactionNumber === 0) {
+      if (opts.immediatelyRender && transactionNumber === 0) {
         return 0;
       }
       return transactionNumber + 1;

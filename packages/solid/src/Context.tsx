@@ -40,7 +40,7 @@ export function EditorProvider(props: EditorProviderProps) {
     "slotBefore",
     "editorContainerProps",
   ]);
-  const editor = useEditor(editorOptions);
+  const editor = useEditor(() => editorOptions);
 
   const contextValue = {
     get editor() {

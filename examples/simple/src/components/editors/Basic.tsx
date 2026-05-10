@@ -4,7 +4,7 @@ import { Tiptap, useEditor } from "tiptap-solid";
 import { MenuBar } from "../MenuBar";
 
 export const BasicEditor = () => {
-  const editor = useEditor({
+  const editor = useEditor(() => ({
     extensions: [
       StarterKit,
       Placeholder.configure({ placeholder: "Write something..." }),
@@ -13,7 +13,7 @@ export const BasicEditor = () => {
       <h2>Basic Setup</h2>
       <p>This is a minimal Tiptap SolidJS integration using <strong>Tailwind 4</strong>.</p>
     `,
-  });
+  }));
 
   return (
     <div class="tiptap-editor overflow-hidden border rounded-lg bg-white shadow-sm">

@@ -5,7 +5,7 @@ import { Tiptap, useEditor } from "tiptap-solid";
 import { MenuBar } from "../MenuBar";
 
 export const MarkdownEditor = () => {
-  const editor = useEditor({
+  const editor = useEditor(() => ({
     extensions: [
       StarterKit,
       Markdown,
@@ -18,7 +18,7 @@ You can **copy/paste** markdown here, or export the content as markdown!
 - *Italics* work
 - [Links](https://tiptap.dev) work
     `,
-  });
+  }));
 
   return (
     <div class="space-y-4">

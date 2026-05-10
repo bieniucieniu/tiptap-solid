@@ -6,7 +6,7 @@ import { BubbleMenu, FloatingMenu } from "tiptap-solid/menus";
 import { Button } from "../MenuBar";
 
 export const MenusEditor = () => {
-  const editor = useEditor({
+  const editor = useEditor(() => ({
     extensions: [
       StarterKit,
       Placeholder.configure({
@@ -18,56 +18,56 @@ export const MenusEditor = () => {
       <p>Or start a new empty line to see the <strong>Floating Menu</strong>.</p>
       <p></p>
     `,
-  });
+  }));
 
   return (
     <div class="tiptap-editor overflow-hidden relative border rounded-lg bg-white shadow-sm">
       <Tiptap editor={editor}>
         <Show when={editor()}>
-          {(editor) => (
+          {(e) => (
             <>
               <BubbleMenu
-                editor={editor()}
+                editor={e}
                 class="flex bg-white border border-border shadow-xl rounded-lg overflow-hidden p-1.5 gap-1 animate-in fade-in zoom-in duration-200"
               >
                 <Button
-                  onClick={() => editor().chain().focus().toggleBold().run()}
+                  onClick={() => e.chain().focus().toggleBold().run()}
                 >
                   B
                 </Button>
                 <Button
-                  onClick={() => editor().chain().focus().toggleItalic().run()}
+                  onClick={() => e.chain().focus().toggleItalic().run()}
                 >
                   I
                 </Button>
                 <Button
-                  onClick={() => editor().chain().focus().toggleStrike().run()}
+                  onClick={() => e.chain().focus().toggleStrike().run()}
                 >
                   S
                 </Button>
               </BubbleMenu>
 
               <FloatingMenu
-                editor={editor()}
+                editor={e}
                 class="flex bg-white border border-border shadow-xl rounded-lg overflow-hidden p-1.5 gap-1 animate-in fade-in slide-in-from-left-4 duration-300"
               >
                 <Button
                   onClick={() =>
-                    editor().chain().focus().toggleHeading({ level: 1 }).run()
+                    e.chain().focus().toggleHeading({ level: 1 }).run()
                   }
                 >
                   H1
                 </Button>
                 <Button
                   onClick={() =>
-                    editor().chain().focus().toggleHeading({ level: 2 }).run()
+                    e.chain().focus().toggleHeading({ level: 2 }).run()
                   }
                 >
                   H2
                 </Button>
                 <Button
                   onClick={() =>
-                    editor().chain().focus().toggleBulletList().run()
+                    e.chain().focus().toggleBulletList().run()
                   }
                 >
                   UL
