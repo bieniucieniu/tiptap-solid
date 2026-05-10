@@ -1,8 +1,8 @@
 import type { Editor } from "@tiptap/core";
 import type { ComponentProps, JSX } from "solid-js";
-import { createSignal, For, onCleanup, onMount, splitProps } from "solid-js";
+import { For, onCleanup, onMount, splitProps } from "solid-js";
+import { createStore } from "solid-js/store";
 import { Dynamic, Portal } from "solid-js/web";
-
 import type { ContentComponent, EditorWithContentComponent } from "./editor";
 import type { SolidRenderer } from "./SolidRenderer";
 
@@ -11,28 +11,22 @@ export interface EditorContentProps extends ComponentProps<"div"> {
 }
 
 function getInstance(): ContentComponent {
-  const [renderers, setRenderers] = createSignal<Record<string, JSX.Element>>(
+  const [renderers, setRenderers] = createStore<Record<string, JSX.Element>>(
     {},
   );
 
   return {
     renderers,
     setRenderer(id: string, renderer: SolidRenderer) {
-      setRenderers((prev) => ({
-        ...prev,
-        [id]: (
-          <Portal mount={renderer.element}>
-            <Dynamic component={renderer.component} {...renderer.props} />
-          </Portal>
-        ),
-      }));
+      setRenderers(
+        id,
+        <Portal mount={renderer.element}>
+          <Dynamic component={renderer.component} {...renderer.props} />
+        </Portal>,
+      );
     },
     removeRenderer(id: string) {
-      setRenderers((prev) => {
-        const next = { ...prev };
-        delete next[id];
-        return next;
-      });
+      setRenderers(id, undefined);
     },
   };
 }
@@ -96,15 +90,13 @@ export const EditorContent = (props: EditorContentProps) => {
       // do nothing
     }
   });
-
   return (
     <>
       <div ref={editorContentRef} {...rest} />
       <For
         each={Object.values(
-          (
-            props.editor as EditorWithContentComponent
-          )?.contentComponent?.renderers() || {},
+          (props.editor as EditorWithContentComponent)?.contentComponent
+            ?.renderers || {},
         )}
       >
         {(portal) => portal}
