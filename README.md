@@ -1,17 +1,62 @@
-# TipTap-Solid
+# tiptap-solid
 
-TipTap integration with Solid.js, used in [Vrite](https://vrite.io)
+SolidJS bindings for [Tiptap](https://tiptap.dev). API and patterns follow [`@tiptap/react`](https://tiptap.dev/docs/editor/getting-started/install/react).
 
-## Installation
+## Install
 
-@TODO
+Not published to npm yet - install from GitHub with peer dependencies:
 
-## Getting started
+```bash
+bun add github:bieniucieniu/tiptap-solid @tiptap/core @tiptap/pm @tiptap/starter-kit solid-js
+```
 
-The integration is based on the official `@tiptap/react` package, that's [documented in the TipTap docs](https://tiptap.dev/installation/react), with several changes necessary to adapt it to Solid.js.
+npm / pnpm:
 
-Here are some examples of common use-cases:
+```bash
+npm install github:bieniucieniu/tiptap-solid @tiptap/core @tiptap/pm @tiptap/starter-kit solid-js
+pnpm add github:bieniucieniu/tiptap-solid @tiptap/core @tiptap/pm @tiptap/starter-kit solid-js
+```
 
-### Creating the editor
+`dist/` is built automatically on install via the `prepare` script. Use aligned `@tiptap/*` versions (≥ 3.23.5).
 
-@TODO
+For bubble/floating menus, also install the extensions and import from `tiptap-solid/menus`:
+
+```bash
+bun add @tiptap/extension-bubble-menu @tiptap/extension-floating-menu
+```
+
+## Usage
+
+```tsx
+import StarterKit from "@tiptap/starter-kit";
+import { Tiptap, useEditor } from "tiptap-solid";
+
+export function Editor() {
+  const editor = useEditor(() => ({
+    extensions: [StarterKit],
+    content: "<p>Hello world</p>",
+  }));
+
+  return (
+    <Tiptap editor={editor}>
+      <Tiptap.Content />
+    </Tiptap>
+  );
+}
+```
+
+## Exports
+
+| Import | Description |
+|---|---|
+| `tiptap-solid` | `Tiptap`, `useEditor`, `useTiptapState`, `EditorContent`, … |
+| `tiptap-solid/menus` | `BubbleMenu`, `FloatingMenu` |
+| `tiptap-solid/node-view` | Custom node view helpers |
+
+## Development
+
+```bash
+bun install
+bun run build
+cd examples/simple && bun run dev
+```
