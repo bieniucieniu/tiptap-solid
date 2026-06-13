@@ -1,19 +1,29 @@
 import { defineConfig } from "tsdown";
 import solid from "unplugin-solid/rolldown";
 
-export default defineConfig({
-  entry: ["src/index.ts", "src/menus/index.ts", "src/node-view.ts"],
+const shared = {
   plugins: [solid()],
   format: ["esm"],
-  clean: true,
+  clean: false,
   dts: true,
   unbundle: false,
   deps: {
-    // Match @tiptap/react: keep all node_modules external in the bundle.
     neverBundle: [/^[^./]/],
   },
   platform: "browser",
-  outputOptions: {
-    dir: "dist",
+};
+
+/** @type {import('tsdown').UserConfig[]} */
+export default [
+  {
+    ...shared,
+    entry: ["src/index.ts", "src/node-view.ts"],
+    clean: true,
+    outputOptions: { dir: "dist" },
   },
-});
+  {
+    ...shared,
+    entry: ["src/menus/index.ts"],
+    outputOptions: { dir: "dist/menus" },
+  },
+];

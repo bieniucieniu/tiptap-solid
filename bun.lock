@@ -6,7 +6,7 @@
       "name": "@vrite/tiptap-solid",
       "dependencies": {
         "fast-equals": "^5.3.3",
-        "tsdown": "^0.22.0",
+        "tsdown": "0.22.0",
         "typescript": "^5.5.0",
         "unplugin-solid": "^1.0.0",
         "unrun": "latest",
@@ -59,7 +59,7 @@
         "@tiptap/core": "^3.23.5",
         "@tiptap/pm": "^3.23.5",
         "solid-js": "^1.9.0",
-        "tsdown": "^0.22.0",
+        "tsdown": "0.22.0",
         "unplugin-solid": "^1.0.0",
         "unrun": "latest",
       },
