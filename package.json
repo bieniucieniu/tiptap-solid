@@ -28,7 +28,13 @@
   "main": "./packages/solid/dist/index.js",
   "module": "./packages/solid/dist/index.js",
   "types": "./packages/solid/dist/index.d.ts",
-  "files": ["packages/solid/src", "packages/solid/dist"],
+  "files": [
+    "packages/solid/src",
+    "packages/solid/dist",
+    "packages/solid/tsdown.config.mjs",
+    "packages/solid/tsconfig.json",
+    "packages/solid/package.json"
+  ],
   "dependencies": {
     "fast-equals": "^5.3.3",
     "tsdown": "^0.22.0",
