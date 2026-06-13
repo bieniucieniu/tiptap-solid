@@ -16,22 +16,34 @@ export type TiptapContextType = {
 /**
  * Solid context that stores the current editor instance.
  */
-export const TiptapContext = createContext<TiptapContextType>({
-  get editor(): Editor {
-    throw new Error("useTiptap must be used within a <Tiptap> provider");
-  },
-});
+export const TiptapContext = createContext<TiptapContextType>();
 
 /**
  * Hook to read the Tiptap context and access the editor instance.
  */
-export const useTiptap = () => useContext(TiptapContext);
+export const useTiptap = () => {
+  const ctx = useContext(TiptapContext);
+  if (!ctx) {
+    throw new Error("useTiptap must be used within a <Tiptap> provider");
+  }
+  return ctx;
+};
 
 export const useTiptapEditor = (
   e?: Accessor<Editor | null>,
 ): Accessor<Editor | null> => {
-  const ctx = useTiptap();
-  return () => e?.() || ctx.editor;
+  const tiptapCtx = useContext(TiptapContext);
+  const legacyCtx = useContext(EditorContext);
+  return () => {
+    const fromAccessor = e?.();
+    if (fromAccessor != null) {
+      return fromAccessor;
+    }
+    if (tiptapCtx) {
+      return tiptapCtx.editor;
+    }
+    return legacyCtx.editor;
+  };
 };
 
 /**
@@ -58,8 +70,7 @@ export type UseTiptapStateOptions<TSelectorResult> = {
 export function useTiptapState<TSelectorResult>(
   options: UseTiptapStateOptions<TSelectorResult>,
 ) {
-  const ctx = useTiptap();
-  const editor = () => options.editor?.() || ctx.editor;
+  const editor = useTiptapEditor(options.editor);
 
   return useEditorState<TSelectorResult>({
     editor,

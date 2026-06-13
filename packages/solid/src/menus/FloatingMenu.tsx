@@ -37,10 +37,11 @@ export const FloatingMenu = (props: FloatingMenuProps) => {
   const resolvedPluginKey = createMemo(() =>
     getAutoPluginKey(props.pluginKey, "floatingMenu"),
   );
-  const menuEl = createMemo(() => {
-    const el = document.createElement("div");
-    spread(el, rest);
-    return el;
+
+  const menuEl = document.createElement("div");
+
+  createEffect(() => {
+    spread(menuEl, rest);
   });
 
   const currentEditorCtx = useCurrentEditor();
@@ -57,7 +58,7 @@ export const FloatingMenu = (props: FloatingMenuProps) => {
       return;
     }
 
-    const floatingMenuElement = menuEl();
+    const floatingMenuElement = menuEl;
     floatingMenuElement.style.visibility = "hidden";
     floatingMenuElement.style.position = "absolute";
 
@@ -106,5 +107,5 @@ export const FloatingMenu = (props: FloatingMenuProps) => {
     );
   });
 
-  return <Portal mount={menuEl()}>{props.children}</Portal>;
+  return <Portal mount={menuEl}>{props.children}</Portal>;
 };

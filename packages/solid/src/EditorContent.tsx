@@ -1,6 +1,12 @@
 import type { Editor } from "@tiptap/core";
 import type { ComponentProps, JSX } from "solid-js";
-import { For, onCleanup, onMount, splitProps } from "solid-js";
+import {
+  createEffect,
+  createMemo,
+  For,
+  onCleanup,
+  splitProps,
+} from "solid-js";
 import { createStore } from "solid-js/store";
 import { Dynamic, Portal } from "solid-js/web";
 import type { ContentComponent, EditorWithContentComponent } from "./editor";
@@ -33,74 +39,76 @@ function getInstance(): ContentComponent {
 
 export const EditorContent = (props: EditorContentProps) => {
   let editorContentRef: HTMLDivElement | undefined;
-  const [, rest] = splitProps(props, ["editor"]);
+  const [local, rest] = splitProps(props, ["editor"]);
 
-  onMount(() => {
-    const editor = props.editor as EditorWithContentComponent | null;
+  createEffect(() => {
+    const editor: EditorWithContentComponent | null = local.editor;
+    const element = editorContentRef;
 
-    if (editor && !editor.isDestroyed && editor.view.dom?.parentNode) {
-      if (editor.contentComponent) {
-        return;
-      }
-
-      const element = editorContentRef;
-      if (!element) return;
-
-      element.append(...Array.from(editor.view.dom.parentNode.childNodes));
-
-      editor.setOptions({
-        element,
-      });
-
-      editor.contentComponent = getInstance();
-      editor.createNodeViews();
-      editor.isEditorContentInitialized = true;
-    }
-  });
-
-  onCleanup(() => {
-    const editor = props.editor as EditorWithContentComponent | null;
-
-    if (!editor) {
+    if (!editor || editor.isDestroyed || !element) {
       return;
     }
 
-    editor.isEditorContentInitialized = false;
-
-    if (!editor.isDestroyed) {
-      editor.view.setProps({
-        nodeViews: {},
-      });
+    if (editor.contentComponent && editor.isEditorContentInitialized) {
+      return;
     }
 
-    editor.contentComponent = null;
+    if (editor.view.dom?.parentNode) {
+      element.append(...Array.from(editor.view.dom.parentNode.childNodes));
+    }
 
-    try {
-      if (!editor.view.dom?.parentNode) {
-        return;
+    editor.setOptions({
+      element,
+    });
+
+    editor.contentComponent = getInstance();
+    editor.createNodeViews();
+    editor.isEditorContentInitialized = true;
+
+    onCleanup(() => {
+      editor.isEditorContentInitialized = false;
+
+      if (!editor.isDestroyed) {
+        editor.view.setProps({
+          nodeViews: {},
+        });
       }
 
-      const newElement = document.createElement("div");
-      newElement.append(...Array.from(editor.view.dom.parentNode.childNodes));
+      editor.contentComponent = null;
 
-      editor.setOptions({
-        element: newElement,
-      });
-    } catch {
-      // do nothing
-    }
+      try {
+        if (!editor.view.dom?.parentNode) {
+          return;
+        }
+
+        const newElement = document.createElement("div");
+        newElement.append(...Array.from(editor.view.dom.parentNode.childNodes));
+
+        editor.setOptions({
+          element: newElement,
+        });
+      } catch {
+        // do nothing
+      }
+    });
   });
+
+  const portals = createMemo((): JSX.Element[] => {
+    const editor: EditorWithContentComponent | null = local.editor;
+    const renderers = editor?.contentComponent?.renderers;
+    if (!renderers) {
+      return [];
+    }
+
+    return Object.values(renderers).filter(
+      (portal): portal is JSX.Element => portal != null,
+    );
+  });
+
   return (
     <>
       <div ref={editorContentRef} {...rest} />
-      <For
-        each={Object.values(
-          (props.editor as EditorWithContentComponent)?.contentComponent
-            ?.renderers || {},
-        )}
-      >
-        {(portal) => portal}
-      </For>
+      <For each={portals()}>{(portal) => portal}</For>
     </>
   );
 };

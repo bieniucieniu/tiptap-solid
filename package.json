@@ -1,12 +1,59 @@
 {
-  "name": "root",
-  "private": true,
-  "workspaces": [
-    "packages/**",
-    "examples/**"
-  ],
-
+  "name": "tiptap-solid",
+  "description": "SolidJS components for tiptap",
+  "version": "0.0.1",
+  "homepage": "https://tiptap.dev",
+  "keywords": ["tiptap", "tiptap solid components"],
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "workspaces": ["packages/**", "examples/**"],
+  "exports": {
+    ".": {
+      "types": "./packages/solid/dist/index.d.ts",
+      "import": "./packages/solid/dist/index.js",
+      "default": "./packages/solid/dist/index.js"
+    },
+    "./menus": {
+      "types": "./packages/solid/dist/menus/index.d.ts",
+      "import": "./packages/solid/dist/menus/index.js",
+      "default": "./packages/solid/dist/menus/index.js"
+    },
+    "./node-view": {
+      "types": "./packages/solid/dist/node-view.d.ts",
+      "import": "./packages/solid/dist/node-view.js",
+      "default": "./packages/solid/dist/node-view.js"
+    }
+  },
+  "main": "./packages/solid/dist/index.js",
+  "module": "./packages/solid/dist/index.js",
+  "types": "./packages/solid/dist/index.d.ts",
+  "files": ["packages/solid/src", "packages/solid/dist"],
+  "dependencies": {
+    "fast-equals": "^5.3.3",
+    "tsdown": "^0.22.0",
+    "typescript": "^5.5.0",
+    "unplugin-solid": "^1.0.0",
+    "unrun": "latest"
+  },
+  "peerDependencies": {
+    "@tiptap/core": "^3.23.5",
+    "@tiptap/pm": "^3.23.5",
+    "solid-js": "^1.9.0"
+  },
+  "optionalDependencies": {
+    "@tiptap/extension-bubble-menu": "^3.23.5",
+    "@tiptap/extension-floating-menu": "^3.23.5"
+  },
   "devDependencies": {
-    "@biomejs/biome": "^2.1.3"
+    "@biomejs/biome": "^2.4.14",
+    "solid-js": "^1.9.0"
+  },
+  "scripts": {
+    "prepare": "bun run build",
+    "build": "bun run --filter @tiptap-solid/lib build",
+    "lint": "bun run --filter @tiptap-solid/lib lint",
+    "check": "bun run --filter @tiptap-solid/lib check",
+    "format": "bun run --filter @tiptap-solid/lib format"
   }
 }

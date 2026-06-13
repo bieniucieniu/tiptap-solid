@@ -6,11 +6,9 @@ import type {
   NodeViewRendererProps,
 } from "@tiptap/core";
 import {
-  cancelPositionCheck,
   getRenderedAttributes,
   isNodeViewSelected,
   NodeView,
-  schedulePositionCheck,
 } from "@tiptap/core";
 import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
 import type {
@@ -60,7 +58,20 @@ export class SolidNodeView<
 
   private currentPos: number | undefined;
 
-  private positionCheckCallback: (() => void) | null = null;
+  private handlePositionUpdate = () => {
+    const newPos = this.getPos();
+
+    if (typeof newPos !== "number" || newPos === this.currentPos) {
+      return;
+    }
+
+    this.currentPos = newPos;
+    this.renderer.updateProps({ getPos: () => this.getPos() });
+
+    if (typeof this.options.attrs === "function") {
+      this.updateElementAttributes();
+    }
+  };
 
   constructor(
     component: Component<SolidNodeViewProps<T>>,
@@ -91,6 +102,10 @@ export class SolidNodeView<
       }
 
       contentTarget.appendChild(this.contentDOMElement);
+    }
+
+    if (this.options.trackNodeViewPosition) {
+      this.editor.on("update", this.handlePositionUpdate);
     }
   }
 
@@ -181,23 +196,6 @@ export class SolidNodeView<
     this.editor.on("selectionUpdate", this.handleSelectionUpdate);
     this.updateElementAttributes();
     this.currentPos = this.getPos();
-
-    this.positionCheckCallback = () => {
-      const newPos = this.getPos();
-
-      if (typeof newPos !== "number" || newPos === this.currentPos) {
-        return;
-      }
-
-      this.currentPos = newPos;
-      this.renderer.updateProps({ getPos: () => this.getPos() });
-
-      if (typeof this.options.attrs === "function") {
-        this.updateElementAttributes();
-      }
-    };
-
-    schedulePositionCheck(this.editor, this.positionCheckCallback);
   }
 
   get dom() {
@@ -302,39 +300,34 @@ export class SolidNodeView<
       });
     }
 
-    const newPos = this.getPos();
+    const nodeChanged = node !== this.node;
 
-    if (
-      node === this.node &&
-      this.decorations === decorations &&
-      this.innerDecorations === innerDecorations
-    ) {
-      if (newPos === this.currentPos) {
-        return true;
-      }
-
-      this.currentPos = newPos;
-      rerenderComponent({
-        node,
-        decorations: decorations as DecorationWithType[],
-        innerDecorations,
-        extension: this.extensionWithSyncedStorage,
-        getPos: () => this.getPos(),
-      });
+    if (!nodeChanged) {
+      this.node = node;
+      this.decorations = decorations;
+      this.innerDecorations = innerDecorations;
       return true;
     }
+
+    const newPos = this.getPos();
 
     this.node = node;
     this.decorations = decorations;
     this.innerDecorations = innerDecorations;
     this.currentPos = newPos;
 
-    rerenderComponent({
+    const extraProps: Partial<SolidNodeViewProps<T>> = {
       node,
       decorations: decorations as DecorationWithType[],
       innerDecorations,
       extension: this.extensionWithSyncedStorage,
-    });
+    };
+
+    if (this.options.trackNodeViewPosition) {
+      extraProps.getPos = () => this.getPos();
+    }
+
+    rerenderComponent(extraProps);
 
     return true;
   }
@@ -357,9 +350,8 @@ export class SolidNodeView<
     this.renderer.destroy();
     this.editor.off("selectionUpdate", this.handleSelectionUpdate);
 
-    if (this.positionCheckCallback) {
-      cancelPositionCheck(this.editor, this.positionCheckCallback);
-      this.positionCheckCallback = null;
+    if (this.options.trackNodeViewPosition) {
+      this.editor.off("update", this.handlePositionUpdate);
     }
 
     this.contentDOMElement = null;
@@ -396,7 +388,8 @@ export function SolidNodeViewRenderer<T = HTMLElement>(
   options?: Partial<SolidNodeViewRendererOptions>,
 ): NodeViewRenderer {
   return (props) => {
-    if (!(props.editor as EditorWithContentComponent).contentComponent) {
+    const editor: EditorWithContentComponent = props.editor;
+    if (!editor.contentComponent) {
       return {} as unknown as ProseMirrorNodeView;
     }
 

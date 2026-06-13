@@ -38,10 +38,10 @@ export const BubbleMenu = (props: BubbleMenuProps) => {
     getAutoPluginKey(props.pluginKey, "bubbleMenu"),
   );
 
-  const menuEl = createMemo(() => {
-    const el = document.createElement("div");
-    spread(el, rest);
-    return el;
+  const menuEl = document.createElement("div");
+
+  createEffect(() => {
+    spread(menuEl, rest);
   });
 
   const currentEditorCtx = useCurrentEditor();
@@ -58,7 +58,7 @@ export const BubbleMenu = (props: BubbleMenuProps) => {
       return;
     }
 
-    const bubbleMenuElement = menuEl();
+    const bubbleMenuElement = menuEl;
     bubbleMenuElement.style.visibility = "hidden";
     bubbleMenuElement.style.position = "absolute";
     const pluginKey = resolvedPluginKey();
@@ -109,5 +109,5 @@ export const BubbleMenu = (props: BubbleMenuProps) => {
     );
   });
 
-  return <Portal mount={menuEl()}>{props.children}</Portal>;
+  return <Portal mount={menuEl}>{props.children}</Portal>;
 };

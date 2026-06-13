@@ -1,13 +1,10 @@
 {
-  "name": "tiptap-solid",
-  "description": "SolidJS components for tiptap",
+  "name": "@tiptap-solid/lib",
+  "private": true,
+  "description": "SolidJS components for tiptap (library source)",
   "version": "0.0.1",
-  "homepage": "https://tiptap.dev",
-  "keywords": [
-    "tiptap",
-    "tiptap solid components"
-  ],
-  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -18,38 +15,40 @@
       "types": "./dist/menus/index.d.ts",
       "import": "./dist/menus/index.js",
       "default": "./dist/menus/index.js"
+    },
+    "./node-view": {
+      "types": "./dist/node-view.d.ts",
+      "import": "./dist/node-view.js",
+      "default": "./dist/node-view.js"
     }
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "type": "module",
-  "files": [
-    "src",
-    "dist"
-  ],
+  "files": ["src", "dist"],
   "dependencies": {
     "fast-equals": "^5.3.3"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.14",
-    "@tiptap/core": "^3.22.5",
-    "@tiptap/pm": "^3.22.5",
+    "@tiptap/core": "^3.23.5",
+    "@tiptap/pm": "^3.23.5",
     "solid-js": "^1.9.0",
-    "tsdown": "latest",
-    "unplugin-solid": "^1.0.0"
+    "tsdown": "^0.22.0",
+    "unplugin-solid": "^1.0.0",
+    "unrun": "latest"
   },
   "optionalDependencies": {
-    "@tiptap/extension-bubble-menu": "^3.22.5",
-    "@tiptap/extension-floating-menu": "^3.22.5"
+    "@tiptap/extension-bubble-menu": "^3.23.5",
+    "@tiptap/extension-floating-menu": "^3.23.5"
   },
   "peerDependencies": {
-    "@tiptap/core": "^3.22.5",
-    "@tiptap/pm": "^3.22.5",
+    "@tiptap/core": "^3.23.5",
+    "@tiptap/pm": "^3.23.5",
     "solid-js": "^1.9.0"
   },
   "scripts": {
-    "build": "tsdown",
+    "build": "tsdown && cp dist/index2.d.ts dist/menus/index.d.ts",
     "lint": "biome lint ./src",
     "check": "biome check ./src --write",
     "format": "biome format ./src --write"

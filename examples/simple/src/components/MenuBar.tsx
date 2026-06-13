@@ -8,6 +8,7 @@ const Button: Component<{
   children: any;
 }> = (props) => (
   <button
+    onMouseDown={(e) => e.preventDefault()}
     onClick={props.onClick}
     disabled={props.disabled}
     class={`px-3 py-1 text-sm font-medium transition-colors rounded-md border 

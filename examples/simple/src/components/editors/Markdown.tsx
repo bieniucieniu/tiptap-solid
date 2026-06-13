@@ -1,7 +1,7 @@
 import StarterKit from "@tiptap/starter-kit";
 import { Markdown } from "tiptap-markdown";
 import Placeholder from "@tiptap/extension-placeholder";
-import { Tiptap, useEditor } from "tiptap-solid";
+import { Tiptap, useEditor, useTiptapState } from "tiptap-solid";
 import { MenuBar } from "../MenuBar";
 
 export const MarkdownEditor = () => {
@@ -20,6 +20,13 @@ You can **copy/paste** markdown here, or export the content as markdown!
     `,
   }));
 
+  const markdown = useTiptapState({
+    editor,
+    selector: (ctx) =>
+      // @ts-expect-error markdown storage comes from tiptap-markdown extension
+      ctx.editor?.storage.markdown.getMarkdown() ?? "",
+  });
+
   return (
     <div class="space-y-4">
       <div class="tiptap-editor overflow-hidden border rounded-lg bg-white shadow-sm">
@@ -33,8 +40,7 @@ You can **copy/paste** markdown here, or export the content as markdown!
           Markdown Output
         </h3>
         <pre class="text-sm overflow-auto whitespace-pre-wrap font-mono text-primary/80">
-          {/* @ts-ignore */}
-          {editor()?.storage.markdown.getMarkdown()}
+          {markdown()}
         </pre>
       </div>
     </div>

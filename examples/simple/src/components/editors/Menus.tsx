@@ -27,47 +27,47 @@ export const MenusEditor = () => {
           {(e) => (
             <>
               <BubbleMenu
-                editor={e}
+                editor={e()}
                 class="flex bg-white border border-border shadow-xl rounded-lg overflow-hidden p-1.5 gap-1 animate-in fade-in zoom-in duration-200"
               >
                 <Button
-                  onClick={() => e.chain().focus().toggleBold().run()}
+                  onClick={() => e().chain().focus().toggleBold().run()}
                 >
                   B
                 </Button>
                 <Button
-                  onClick={() => e.chain().focus().toggleItalic().run()}
+                  onClick={() => e().chain().focus().toggleItalic().run()}
                 >
                   I
                 </Button>
                 <Button
-                  onClick={() => e.chain().focus().toggleStrike().run()}
+                  onClick={() => e().chain().focus().toggleStrike().run()}
                 >
                   S
                 </Button>
               </BubbleMenu>
 
               <FloatingMenu
-                editor={e}
+                editor={e()}
                 class="flex bg-white border border-border shadow-xl rounded-lg overflow-hidden p-1.5 gap-1 animate-in fade-in slide-in-from-left-4 duration-300"
               >
                 <Button
                   onClick={() =>
-                    e.chain().focus().toggleHeading({ level: 1 }).run()
+                    e().chain().focus().toggleHeading({ level: 1 }).run()
                   }
                 >
                   H1
                 </Button>
                 <Button
                   onClick={() =>
-                    e.chain().focus().toggleHeading({ level: 2 }).run()
+                    e().chain().focus().toggleHeading({ level: 2 }).run()
                   }
                 >
                   H2
                 </Button>
                 <Button
                   onClick={() =>
-                    e.chain().focus().toggleBulletList().run()
+                    e().chain().focus().toggleBulletList().run()
                   }
                 >
                   UL

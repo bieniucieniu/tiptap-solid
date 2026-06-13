@@ -35,7 +35,7 @@ export class SolidRenderer<P extends AnyProps = AnyProps> {
   ) {
     this.id = Math.floor(Math.random() * 0xffffffff).toString();
     this.component = component;
-    this.editor = editor as EditorWithContentComponent<P>;
+    this.editor = editor;
 
     const [store, setStore] = createStore(props as P);
     this.props = store;
