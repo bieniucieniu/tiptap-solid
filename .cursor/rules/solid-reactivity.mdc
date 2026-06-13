@@ -1,0 +1,44 @@
+---
+description: SolidJS reactivity conventions for tiptap-solid
+globs: packages/solid/**/*.tsx, packages/solid/**/*.ts, examples/**/*.tsx
+alwaysApply: false
+---
+
+# Solid reactivity in tiptap-solid
+
+Solid components run once. Do not assume React-style re-renders.
+
+## JSX props are getters
+
+The compiler wraps props in getters, so passing a signal read in JSX stays reactive:
+
+```tsx
+// JSX — reactive (compiler emits a getter)
+<EditorContent editor={editor()} />
+
+// equivalent
+createComponent(EditorContent, {
+  get editor() {
+    return editor();
+  },
+});
+```
+
+Read props inside `createEffect`, `createMemo`, or JSX — not once in `onMount` or at the top of the component body.
+
+## Hooks vs props
+
+- **JSX props:** `editor={editor()}` is fine; read `local.editor` / `props.editor` in effects.
+- **Hook APIs:** pass accessors explicitly, e.g. `useEditor(() => options)`, `useTiptapState({ editor, selector })`.
+
+## Editor state
+
+Use `useEditorState` / `useTiptapState` for UI derived from the editor (toolbar active states, markdown preview). Do not read `editor()` once in JSX for values that change on transactions.
+
+## Avoid
+
+- Destructuring props/signals at the top level (breaks tracking)
+- `onMount` for logic that must re-run when props or signals change — use `createEffect`
+- Passing raw accessor functions as props when a JSX getter is intended (`editor={editor}` passes the function, not its value)
+- Inline `as` casts — prefer typed locals when narrowing: `const editor: EditorWithContentComponent = props.editor`
+- `as` on empty arrays/returns — prefer `createMemo((): T[] => …)` or a type predicate in `.filter()`
