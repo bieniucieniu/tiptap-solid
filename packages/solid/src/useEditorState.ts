@@ -29,7 +29,7 @@ export type UseEditorStateOptions<
 
 export function useEditorState<TSelectorResult>(
   options: UseEditorStateOptions<TSelectorResult, Editor | null>,
-): Accessor<TSelectorResult | null> {
+): Accessor<TSelectorResult> {
   const [transactionNumber, setTransactionNumber] = createSignal(0);
   const getEditor = useTiptapEditor(options.editor);
 
@@ -59,7 +59,7 @@ export function useEditorState<TSelectorResult>(
     });
     const equalityFn = options.equalityFn ?? deepEqual;
 
-    if (equalityFn(next, prev)) {
+    if (prev != null && equalityFn(next, prev)) {
       return prev;
     }
 

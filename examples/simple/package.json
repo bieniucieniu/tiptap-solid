@@ -24,8 +24,8 @@
     "@tailwindcss/vite": "^4.3.0",
     "tailwindcss": "^4.3.0",
     "typescript": "^5.5.4",
-    "vite": "catalog:",
+    "vite": "^8.0.16",
     "vite-plugin-solid": "^2.11.0",
-    "vite-plus": "catalog:"
+    "vite-plus": "^0.1.24"
   }
 }

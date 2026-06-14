@@ -28,8 +28,13 @@ export const useTiptap = () => {
   }
   return ctx;
 };
-
-export const useTiptapEditor = (e?: Accessor<Editor | null>): Accessor<Editor | null> => {
+export function useTiptapEditor<TEditor extends Editor | null = Editor | null>(
+  e: Accessor<TEditor>,
+): Accessor<TEditor>;
+export function useTiptapEditor<TEditor extends Editor | null = Editor | null>(
+  e?: Accessor<TEditor>,
+): Accessor<TEditor | null>;
+export function useTiptapEditor(e?: Accessor<Editor | null>): Accessor<Editor | null> {
   const tiptapCtx = useContext(TiptapContext);
   const legacyCtx = useContext(EditorContext);
   return () => {
@@ -42,16 +47,33 @@ export const useTiptapEditor = (e?: Accessor<Editor | null>): Accessor<Editor | 
     }
     return legacyCtx.editor;
   };
-};
+}
 
 /**
  * Options for the `useTiptapState` hook.
  */
-export type UseTiptapStateOptions<TSelectorResult> = {
+export type UseTiptapStateOptions<TSelectorResult, TEditor extends Editor | null> = {
   /**
    * The editor instance. If not provided, it will use the editor from the Tiptap context.
    */
-  editor?: Accessor<Editor | null>;
+  editor: Accessor<TEditor>;
+  /**
+   * A selector function to determine the value to compare for re-rendering.
+   */
+  selector: (context: EditorStateSnapshot<TEditor>) => TSelectorResult;
+  /**
+   * A custom equality function to determine if the component should re-render.
+   */
+  equalityFn?: (a: TSelectorResult, b: TSelectorResult | null) => boolean;
+};
+/**
+ * Options for the `useTiptapState` hook.
+ */
+export type UseTiptapStateNullableOptions<TSelectorResult> = {
+  /**
+   * The editor instance. If not provided, it will use the editor from the Tiptap context.
+   */
+  editor?: never;
   /**
    * A selector function to determine the value to compare for re-rendering.
    */
@@ -65,10 +87,18 @@ export type UseTiptapStateOptions<TSelectorResult> = {
 /**
  * Select a slice of the editor state using the context-provided editor.
  */
-export function useTiptapState<TSelectorResult>(options: UseTiptapStateOptions<TSelectorResult>) {
+export function useTiptapState<TSelectorResult, TEditor extends Editor | null>(
+  options: UseTiptapStateOptions<TSelectorResult, TEditor>,
+): Accessor<TSelectorResult>;
+export function useTiptapState<TSelectorResult>(
+  options: UseTiptapStateNullableOptions<TSelectorResult>,
+): Accessor<TSelectorResult>;
+export function useTiptapState(
+  options: UseTiptapStateNullableOptions<any> | UseTiptapStateOptions<any, any>,
+) {
   const editor = useTiptapEditor(options.editor);
 
-  return useEditorState<TSelectorResult>({
+  return useEditorState({
     editor,
     selector: options.selector,
     equalityFn: options.equalityFn,
