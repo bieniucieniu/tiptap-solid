@@ -51,10 +51,7 @@ export function EditorProvider(props: EditorProviderProps) {
   return (
     <EditorContext.Provider value={contextValue}>
       {props.slotBefore}
-      <EditorContent
-        editor={editor()}
-        {...(props.editorContainerProps || {})}
-      />
+      <EditorContent editor={editor()} {...(props.editorContainerProps || {})} />
       {props.children}
       {props.slotAfter}
     </EditorContext.Provider>

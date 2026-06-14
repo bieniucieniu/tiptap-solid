@@ -5,11 +5,10 @@ import type { SolidRenderer } from "./SolidRenderer";
 
 export type AnyProps = Record<string, any>;
 
-export type EditorWithContentComponent<P extends AnyProps = AnyProps> =
-  Editor & {
-    contentComponent?: ContentComponent<P> | null;
-    isEditorContentInitialized?: boolean;
-  };
+export type EditorWithContentComponent<P extends AnyProps = AnyProps> = Editor & {
+  contentComponent?: ContentComponent<P> | null;
+  isEditorContentInitialized?: boolean;
+};
 
 export type ContentComponent<P extends AnyProps = AnyProps> = {
   setRenderer(id: string, renderer: SolidRenderer<P>): void;

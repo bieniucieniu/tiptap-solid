@@ -5,10 +5,7 @@ import { MenuBar } from "../MenuBar";
 
 export const BasicEditor = () => {
   const editor = useEditor(() => ({
-    extensions: [
-      StarterKit,
-      Placeholder.configure({ placeholder: "Write something..." }),
-    ],
+    extensions: [StarterKit, Placeholder.configure({ placeholder: "Write something..." })],
     content: `
       <h2>Basic Setup</h2>
       <p>This is a minimal Tiptap SolidJS integration using <strong>Tailwind 4</strong>.</p>

@@ -1,12 +1,6 @@
 import type { Editor } from "@tiptap/core";
 import type { ComponentProps, JSX } from "solid-js";
-import {
-  createEffect,
-  createMemo,
-  For,
-  onCleanup,
-  splitProps,
-} from "solid-js";
+import { createEffect, createMemo, For, onCleanup, splitProps } from "solid-js";
 import { createStore } from "solid-js/store";
 import { Dynamic, Portal } from "solid-js/web";
 import type { ContentComponent, EditorWithContentComponent } from "./editor";
@@ -17,9 +11,7 @@ export interface EditorContentProps extends ComponentProps<"div"> {
 }
 
 function getInstance(): ContentComponent {
-  const [renderers, setRenderers] = createStore<Record<string, JSX.Element>>(
-    {},
-  );
+  const [renderers, setRenderers] = createStore<Record<string, JSX.Element>>({});
 
   return {
     renderers,
@@ -100,9 +92,7 @@ export const EditorContent = (props: EditorContentProps) => {
       return [];
     }
 
-    return Object.values(renderers).filter(
-      (portal): portal is JSX.Element => portal != null,
-    );
+    return Object.values(renderers).filter((portal): portal is JSX.Element => portal != null);
   });
 
   return (

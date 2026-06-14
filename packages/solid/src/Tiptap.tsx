@@ -29,9 +29,7 @@ export const useTiptap = () => {
   return ctx;
 };
 
-export const useTiptapEditor = (
-  e?: Accessor<Editor | null>,
-): Accessor<Editor | null> => {
+export const useTiptapEditor = (e?: Accessor<Editor | null>): Accessor<Editor | null> => {
   const tiptapCtx = useContext(TiptapContext);
   const legacyCtx = useContext(EditorContext);
   return () => {
@@ -67,9 +65,7 @@ export type UseTiptapStateOptions<TSelectorResult> = {
 /**
  * Select a slice of the editor state using the context-provided editor.
  */
-export function useTiptapState<TSelectorResult>(
-  options: UseTiptapStateOptions<TSelectorResult>,
-) {
+export function useTiptapState<TSelectorResult>(options: UseTiptapStateOptions<TSelectorResult>) {
   const editor = useTiptapEditor(options.editor);
 
   return useEditorState<TSelectorResult>({
@@ -107,9 +103,7 @@ export function TiptapWrapper(props: TiptapWrapperProps) {
 
   return (
     <EditorContext.Provider value={legacyContextValue}>
-      <TiptapContext.Provider value={tiptapContextValue}>
-        {props.children}
-      </TiptapContext.Provider>
+      <TiptapContext.Provider value={tiptapContextValue}>{props.children}</TiptapContext.Provider>
     </EditorContext.Provider>
   );
 }

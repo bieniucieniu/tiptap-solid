@@ -1,19 +1,12 @@
 import type { Editor } from "@tiptap/core";
 import { deepEqual } from "fast-equals";
-import {
-  type Accessor,
-  createEffect,
-  createMemo,
-  createSignal,
-  onCleanup,
-} from "solid-js";
+import { type Accessor, createEffect, createMemo, createSignal, onCleanup } from "solid-js";
 import { useTiptapEditor } from "./Tiptap";
 
-export type EditorStateSnapshot<TEditor extends Editor | null = Editor | null> =
-  {
-    editor: TEditor;
-    transactionNumber: number;
-  };
+export type EditorStateSnapshot<TEditor extends Editor | null = Editor | null> = {
+  editor: TEditor;
+  transactionNumber: number;
+};
 
 export type UseEditorStateOptions<
   TSelectorResult,

@@ -39,7 +39,9 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
   }
 }
 
@@ -53,15 +55,33 @@
   content: attr(data-placeholder);
 }
 
-.ProseMirror h1 { @apply text-4xl font-extrabold mb-4; }
-.ProseMirror h2 { @apply text-3xl font-bold mb-3 mt-6; }
-.ProseMirror h3 { @apply text-2xl font-semibold mb-2 mt-4; }
-.ProseMirror p { @apply mb-4 leading-relaxed; }
-.ProseMirror ul { @apply list-disc ml-6 mb-4; }
-.ProseMirror ol { @apply list-decimal ml-6 mb-4; }
-.ProseMirror blockquote { @apply border-l-4 border-primary/20 pl-4 italic my-6 text-muted-foreground; }
-.ProseMirror code { @apply bg-muted px-1.5 py-0.5 rounded text-sm font-mono; }
-.ProseMirror pre { @apply bg-primary text-primary-foreground p-4 rounded-lg my-4 font-mono text-sm overflow-x-auto; }
+.ProseMirror h1 {
+  @apply text-4xl font-extrabold mb-4;
+}
+.ProseMirror h2 {
+  @apply text-3xl font-bold mb-3 mt-6;
+}
+.ProseMirror h3 {
+  @apply text-2xl font-semibold mb-2 mt-4;
+}
+.ProseMirror p {
+  @apply mb-4 leading-relaxed;
+}
+.ProseMirror ul {
+  @apply list-disc ml-6 mb-4;
+}
+.ProseMirror ol {
+  @apply list-decimal ml-6 mb-4;
+}
+.ProseMirror blockquote {
+  @apply border-l-4 border-primary/20 pl-4 italic my-6 text-muted-foreground;
+}
+.ProseMirror code {
+  @apply bg-muted px-1.5 py-0.5 rounded text-sm font-mono;
+}
+.ProseMirror pre {
+  @apply bg-primary text-primary-foreground p-4 rounded-lg my-4 font-mono text-sm overflow-x-auto;
+}
 
 .tiptap-editor {
   @apply border rounded-md bg-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2;

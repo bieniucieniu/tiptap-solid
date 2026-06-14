@@ -14,8 +14,7 @@ const isSSR = typeof window === "undefined";
 const isDev =
   //@ts-expect-error
   typeof process !== "undefined" && process.env.NODE_ENV !== "production";
-const isNext =
-  isSSR || Boolean(typeof window !== "undefined" && (window as any).next);
+const isNext = isSSR || Boolean(typeof window !== "undefined" && (window as any).next);
 
 export type UseEditorOptions = Partial<EditorOptions> & {
   /**
@@ -81,11 +80,7 @@ function shouldRecreate(a: UseEditorOptions, b: UseEditorOptions) {
     if (a.extensions.length !== b.extensions.length) {
       return true;
     }
-    if (
-      a.extensions.some(
-        (extension, index) => extension !== b.extensions?.[index],
-      )
-    ) {
+    if (a.extensions.some((extension, index) => extension !== b.extensions?.[index])) {
       return true;
     }
   }
@@ -95,9 +90,7 @@ function shouldRecreate(a: UseEditorOptions, b: UseEditorOptions) {
 export function useEditor(
   options: Accessor<UseEditorOptions & { immediatelyRender: false }>,
 ): Accessor<Editor | null>;
-export function useEditor(
-  options: Accessor<UseEditorOptions>,
-): Accessor<Editor>;
+export function useEditor(options: Accessor<UseEditorOptions>): Accessor<Editor>;
 export function useEditor(
   options: Accessor<UseEditorOptions> = () => ({}),
 ): Accessor<Editor | null> {

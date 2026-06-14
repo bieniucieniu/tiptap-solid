@@ -6,11 +6,7 @@ import { MenuBar } from "../MenuBar";
 
 export const MarkdownEditor = () => {
   const editor = useEditor(() => ({
-    extensions: [
-      StarterKit,
-      Markdown,
-      Placeholder.configure({ placeholder: "Try markdown..." }),
-    ],
+    extensions: [StarterKit, Markdown, Placeholder.configure({ placeholder: "Try markdown..." })],
     content: `
 # Markdown Support
 You can **copy/paste** markdown here, or export the content as markdown!

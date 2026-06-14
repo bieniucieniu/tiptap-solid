@@ -39,8 +39,7 @@ export class SolidRenderer<P extends AnyProps = AnyProps> {
 
     const [store, setStore] = createStore(props as P);
     this.props = store;
-    this.setProps = (newProps: Partial<P>) =>
-      setStore(reconcile(newProps as P));
+    this.setProps = (newProps: Partial<P>) => setStore(reconcile(newProps as P));
 
     this.element = document.createElement(as);
     this.element.classList.add("solid-renderer");

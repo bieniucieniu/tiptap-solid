@@ -1,8 +1,4 @@
-import type {
-  MarkViewProps,
-  MarkViewRenderer,
-  MarkViewRendererOptions,
-} from "@tiptap/core";
+import type { MarkViewProps, MarkViewRenderer, MarkViewRendererOptions } from "@tiptap/core";
 import { MarkView } from "@tiptap/core";
 import type { Component, ComponentProps } from "solid-js";
 import { createContext, splitProps, useContext } from "solid-js";
@@ -66,9 +62,7 @@ export class SolidMarkView extends MarkView<
 
     this.contentDOMElement = document.createElement("span");
 
-    const markViewContentRef: MarkViewContextProps["markViewContentRef"] = (
-      el,
-    ) => {
+    const markViewContentRef: MarkViewContextProps["markViewContentRef"] = (el) => {
       if (el && !el.contains(this.contentDOMElement)) {
         el.appendChild(this.contentDOMElement);
       }

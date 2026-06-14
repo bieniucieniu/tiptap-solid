@@ -4,7 +4,7 @@ SolidJS bindings for [Tiptap](https://tiptap.dev). API and patterns follow [`@ti
 
 ## Install
 
-Not published to npm yet - install from GitHub with peer dependencies:
+Not published to npm yet — install from GitHub with peer dependencies:
 
 ```bash
 bun add github:bieniucieniu/tiptap-solid @tiptap/core @tiptap/pm @tiptap/starter-kit solid-js
@@ -47,16 +47,21 @@ export function Editor() {
 
 ## Exports
 
-| Import | Description |
-|---|---|
-| `tiptap-solid` | `Tiptap`, `useEditor`, `useTiptapState`, `EditorContent`, … |
-| `tiptap-solid/menus` | `BubbleMenu`, `FloatingMenu` |
-| `tiptap-solid/node-view` | Custom node view helpers |
+| Import                   | Description                                                 |
+| ------------------------ | ----------------------------------------------------------- |
+| `tiptap-solid`           | `Tiptap`, `useEditor`, `useTiptapState`, `EditorContent`, … |
+| `tiptap-solid/menus`     | `BubbleMenu`, `FloatingMenu`                                |
+| `tiptap-solid/node-view` | Custom node view helpers                                    |
 
 ## Development
 
+This project uses [Vite+](https://viteplus.dev/guide/). Install the global CLI, then:
+
 ```bash
-bun install
-bun run build
-cd examples/simple && bun run dev
+vp install
+vp build                 # build library (vp pack in packages/solid)
+vp dev                   # example app
+vp preview               # preview example build
+vp check                 # format, lint, type-check
+vp build examples/simple # production build for example
 ```

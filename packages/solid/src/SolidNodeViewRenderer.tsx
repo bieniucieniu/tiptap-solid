@@ -5,11 +5,7 @@ import type {
   NodeViewRendererOptions,
   NodeViewRendererProps,
 } from "@tiptap/core";
-import {
-  getRenderedAttributes,
-  isNodeViewSelected,
-  NodeView,
-} from "@tiptap/core";
+import { getRenderedAttributes, isNodeViewSelected, NodeView } from "@tiptap/core";
 import type { Node as ProseMirrorNode } from "@tiptap/pm/model";
 import type {
   Decoration,
@@ -82,13 +78,9 @@ export class SolidNodeView<
 
     if (!this.node.isLeaf) {
       if (this.options.contentDOMElementTag) {
-        this.contentDOMElement = document.createElement(
-          this.options.contentDOMElementTag,
-        );
+        this.contentDOMElement = document.createElement(this.options.contentDOMElementTag);
       } else {
-        this.contentDOMElement = document.createElement(
-          this.node.isInline ? "span" : "div",
-        );
+        this.contentDOMElement = document.createElement(this.node.isInline ? "span" : "div");
       }
 
       this.contentDOMElement.dataset.nodeViewContentSolid = "";
@@ -109,9 +101,7 @@ export class SolidNodeView<
     }
   }
 
-  private cachedExtensionWithSyncedStorage:
-    | NodeViewRendererProps["extension"]
-    | null = null;
+  private cachedExtensionWithSyncedStorage: NodeViewRendererProps["extension"] | null = null;
 
   get extensionWithSyncedStorage(): NodeViewRendererProps["extension"] {
     if (!this.cachedExtensionWithSyncedStorage) {
@@ -121,10 +111,7 @@ export class SolidNodeView<
       this.cachedExtensionWithSyncedStorage = new Proxy(extension, {
         get(target, prop, receiver) {
           if (prop === "storage") {
-            return (
-              editor.storage[extension.name as keyof typeof editor.storage] ??
-              {}
-            );
+            return editor.storage[extension.name as keyof typeof editor.storage] ?? {};
           }
           return Reflect.get(target, prop, receiver);
         },
@@ -137,11 +124,7 @@ export class SolidNodeView<
   mount() {
     const onDragStart = this.onDragStart.bind(this);
     const nodeViewContentRef = (element: HTMLElement | null) => {
-      if (
-        element &&
-        this.contentDOMElement &&
-        element.firstChild !== this.contentDOMElement
-      ) {
+      if (element && this.contentDOMElement && element.firstChild !== this.contentDOMElement) {
         if (element.hasAttribute("data-node-view-wrapper")) {
           element.removeAttribute("data-node-view-wrapper");
         }
@@ -151,9 +134,7 @@ export class SolidNodeView<
 
     const SolidNodeViewProvider: Component<SolidNodeViewProps<T>> = (props) => {
       return (
-        <SolidNodeViewContext.Provider
-          value={{ onDragStart, nodeViewContentRef }}
-        >
+        <SolidNodeViewContext.Provider value={{ onDragStart, nodeViewContentRef }}>
           <this.component {...props} />
         </SolidNodeViewContext.Provider>
       );
@@ -169,7 +150,7 @@ export class SolidNodeView<
       extension: this.extensionWithSyncedStorage,
       HTMLAttributes: this.HTMLAttributes,
       getPos: () => this.getPos(),
-      updateAttributes: (attributes = {}) => this.updateAttributes(attributes),
+      updateAttributes: (attributes) => this.updateAttributes(attributes),
       deleteNode: () => this.deleteNode(),
       ref: (_: T | null) => {
         // no-op for now, but could be used to expose the element
@@ -201,13 +182,9 @@ export class SolidNodeView<
   get dom() {
     if (
       this.renderer.element.firstElementChild &&
-      !this.renderer.element.firstElementChild?.hasAttribute(
-        "data-node-view-wrapper",
-      )
+      !this.renderer.element.firstElementChild?.hasAttribute("data-node-view-wrapper")
     ) {
-      throw Error(
-        "Please use the NodeViewWrapper component for your node view.",
-      );
+      throw Error("Please use the NodeViewWrapper component for your node view.");
     }
 
     return this.renderer.element;
@@ -368,10 +345,7 @@ export class SolidNodeView<
 
       if (typeof this.options.attrs === "function") {
         const extensionAttributes = this.editor.extensionManager.attributes;
-        const HTMLAttributes = getRenderedAttributes(
-          this.node,
-          extensionAttributes,
-        );
+        const HTMLAttributes = getRenderedAttributes(this.node, extensionAttributes);
 
         attrsObj = this.options.attrs({ node: this.node, HTMLAttributes });
       } else {

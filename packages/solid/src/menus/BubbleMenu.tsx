@@ -1,14 +1,5 @@
-import {
-  BubbleMenuPlugin,
-  type BubbleMenuPluginProps,
-} from "@tiptap/extension-bubble-menu";
-import {
-  createEffect,
-  createMemo,
-  type JSX,
-  onCleanup,
-  splitProps,
-} from "solid-js";
+import { BubbleMenuPlugin, type BubbleMenuPluginProps } from "@tiptap/extension-bubble-menu";
+import { createEffect, createMemo, type JSX, onCleanup, splitProps } from "solid-js";
 import { Portal, spread } from "solid-js/web";
 import { useCurrentEditor } from "../Context";
 import { getAutoPluginKey } from "./getAutoPluginKey";
@@ -34,9 +25,7 @@ export const BubbleMenu = (props: BubbleMenuProps) => {
     "children",
   ]);
 
-  const resolvedPluginKey = createMemo(() =>
-    getAutoPluginKey(props.pluginKey, "bubbleMenu"),
-  );
+  const resolvedPluginKey = createMemo(() => getAutoPluginKey(props.pluginKey, "bubbleMenu"));
 
   const menuEl = document.createElement("div");
 

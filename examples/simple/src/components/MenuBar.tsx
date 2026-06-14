@@ -27,20 +27,40 @@ export const MenuBar = () => {
 
   const states = useTiptapState({
     editor: () => ctx.editor,
-    selector: (ctx) => ({
-      isBold: ctx.editor.isActive("bold"),
-      isItalic: ctx.editor.isActive("italic"),
-      isStrike: ctx.editor.isActive("strike"),
-      isCode: ctx.editor.isActive("code"),
-      isHeading1: ctx.editor.isActive("heading", { level: 1 }),
-      isHeading2: ctx.editor.isActive("heading", { level: 2 }),
-      isBulletList: ctx.editor.isActive("bulletList"),
-      isOrderedList: ctx.editor.isActive("orderedList"),
-      isCodeBlock: ctx.editor.isActive("codeBlock"),
-      isBlockquote: ctx.editor.isActive("blockquote"),
-      canUndo: ctx.editor.can().chain().focus().undo().run(),
-      canRedo: ctx.editor.can().chain().focus().redo().run(),
-    }),
+    selector: (ctx) => {
+      const editor = ctx.editor;
+      if (!editor) {
+        return {
+          isBold: false,
+          isItalic: false,
+          isStrike: false,
+          isCode: false,
+          isHeading1: false,
+          isHeading2: false,
+          isBulletList: false,
+          isOrderedList: false,
+          isCodeBlock: false,
+          isBlockquote: false,
+          canUndo: false,
+          canRedo: false,
+        };
+      }
+
+      return {
+        isBold: editor.isActive("bold"),
+        isItalic: editor.isActive("italic"),
+        isStrike: editor.isActive("strike"),
+        isCode: editor.isActive("code"),
+        isHeading1: editor.isActive("heading", { level: 1 }),
+        isHeading2: editor.isActive("heading", { level: 2 }),
+        isBulletList: editor.isActive("bulletList"),
+        isOrderedList: editor.isActive("orderedList"),
+        isCodeBlock: editor.isActive("codeBlock"),
+        isBlockquote: editor.isActive("blockquote"),
+        canUndo: editor.can().chain().focus().undo().run(),
+        canRedo: editor.can().chain().focus().redo().run(),
+      };
+    },
   });
 
   return (
@@ -71,17 +91,13 @@ export const MenuBar = () => {
       </Button>
       <div class="w-px h-6 bg-border mx-1 self-center" />
       <Button
-        onClick={() =>
-          ctx.editor.chain().focus().toggleHeading({ level: 1 }).run()
-        }
+        onClick={() => ctx.editor.chain().focus().toggleHeading({ level: 1 }).run()}
         isActive={states()?.isHeading1}
       >
         H1
       </Button>
       <Button
-        onClick={() =>
-          ctx.editor.chain().focus().toggleHeading({ level: 2 }).run()
-        }
+        onClick={() => ctx.editor.chain().focus().toggleHeading({ level: 2 }).run()}
         isActive={states()?.isHeading2}
       >
         H2
@@ -99,16 +115,10 @@ export const MenuBar = () => {
         Ordered
       </Button>
       <div class="w-px h-6 bg-border mx-1 self-center" />
-      <Button
-        onClick={() => ctx.editor.chain().focus().undo().run()}
-        disabled={!states()?.canUndo}
-      >
+      <Button onClick={() => ctx.editor.chain().focus().undo().run()} disabled={!states()?.canUndo}>
         Undo
       </Button>
-      <Button
-        onClick={() => ctx.editor.chain().focus().redo().run()}
-        disabled={!states()?.canRedo}
-      >
+      <Button onClick={() => ctx.editor.chain().focus().redo().run()} disabled={!states()?.canRedo}>
         Redo
       </Button>
     </div>

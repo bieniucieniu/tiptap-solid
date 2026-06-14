@@ -1,14 +1,5 @@
-import {
-  FloatingMenuPlugin,
-  type FloatingMenuPluginProps,
-} from "@tiptap/extension-floating-menu";
-import {
-  createEffect,
-  createMemo,
-  type JSX,
-  onCleanup,
-  splitProps,
-} from "solid-js";
+import { FloatingMenuPlugin, type FloatingMenuPluginProps } from "@tiptap/extension-floating-menu";
+import { createEffect, createMemo, type JSX, onCleanup, splitProps } from "solid-js";
 import { Portal, spread } from "solid-js/web";
 import { useCurrentEditor } from "../Context";
 import { getAutoPluginKey } from "./getAutoPluginKey";
@@ -34,9 +25,7 @@ export const FloatingMenu = (props: FloatingMenuProps) => {
     "children",
   ]);
 
-  const resolvedPluginKey = createMemo(() =>
-    getAutoPluginKey(props.pluginKey, "floatingMenu"),
-  );
+  const resolvedPluginKey = createMemo(() => getAutoPluginKey(props.pluginKey, "floatingMenu"));
 
   const menuEl = document.createElement("div");
 
