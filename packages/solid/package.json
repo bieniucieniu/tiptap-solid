@@ -28,6 +28,9 @@
   "dependencies": {
     "fast-equals": "^5.3.3"
   },
+  "devDependencies": {
+    "unplugin-solid": "^1.0.0"
+  },
   "peerDependencies": {
     "@tiptap/core": "^3.23.5",
     "@tiptap/pm": "^3.23.5",
