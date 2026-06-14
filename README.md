@@ -17,7 +17,17 @@ npm install github:bieniucieniu/tiptap-solid @tiptap/core @tiptap/pm @tiptap/sta
 pnpm add github:bieniucieniu/tiptap-solid @tiptap/core @tiptap/pm @tiptap/starter-kit solid-js
 ```
 
-`dist/` is built automatically on install via the `prepare` script. Use aligned `@tiptap/*` versions (≥ 3.23.5).
+`dist/` (including `.d.ts`) is built on install via `prepare` (`vp pack` for JS, then `tsc` for types). Use aligned `@tiptap/*` versions (≥ 3.23.5).
+
+With Bun, allow install scripts:
+
+```json
+{
+  "trustedDependencies": ["tiptap-solid"]
+}
+```
+
+After updating, reinstall (`bun update tiptap-solid`) so `prepare` runs again.
 
 For bubble/floating menus, also install the extensions and import from `tiptap-solid/menus`:
 

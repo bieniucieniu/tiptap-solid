@@ -4,46 +4,29 @@
   "private": true,
   "description": "SolidJS components for tiptap (library source)",
   "files": [
-    "src",
-    "dist",
-    "vite.config.mjs",
-    "tsconfig.json"
+    "src"
   ],
   "type": "module",
   "sideEffects": false,
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "default": "./dist/index.js"
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
     },
     "./menus": {
-      "types": "./dist/menus/index.d.ts",
-      "import": "./dist/menus/index.js",
-      "default": "./dist/menus/index.js"
+      "types": "./src/menus/index.ts",
+      "import": "./src/menus/index.ts",
+      "default": "./src/menus/index.ts"
     },
     "./node-view": {
-      "types": "./dist/node-view.d.ts",
-      "import": "./dist/node-view.js",
-      "default": "./dist/node-view.js"
+      "types": "./src/node-view.ts",
+      "import": "./src/node-view.ts",
+      "default": "./src/node-view.ts"
     }
-  },
-  "scripts": {
-    "build": "vp pack"
   },
   "dependencies": {
     "fast-equals": "^5.3.3"
-  },
-  "devDependencies": {
-    "@tiptap/core": "^3.23.5",
-    "@tiptap/pm": "^3.23.5",
-    "solid-js": "^1.9.0",
-    "unplugin-solid": "^1.0.0",
-    "unrun": "latest",
-    "vite-plus": "catalog:"
   },
   "peerDependencies": {
     "@tiptap/core": "^3.23.5",

@@ -5,14 +5,14 @@
     "": {
       "name": "@vrite/tiptap-solid",
       "dependencies": {
+        "@tiptap/core": "^3.23.5",
+        "@tiptap/pm": "^3.23.5",
         "fast-equals": "^5.3.3",
+        "solid-js": "^1.9.0",
         "typescript": "^5.5.0",
         "unplugin-solid": "^1.0.0",
         "unrun": "latest",
         "vite-plus": "^0.1.24",
-      },
-      "devDependencies": {
-        "solid-js": "^1.9.0",
       },
       "optionalDependencies": {
         "@tiptap/extension-bubble-menu": "^3.23.5",
